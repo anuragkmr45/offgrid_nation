@@ -3,7 +3,7 @@ import 'package:offgrid_nation_app/features/auth/presentation/bloc/reset_passwor
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/screens/product_details_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
-import 'package:offgrid_nation_app/features/root/presentation/screens/notification_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/screens/notification/notification_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/privacy_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/user_profile/profile_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/settings_screen.dart';
@@ -93,7 +93,7 @@ class App extends StatelessWidget {
                 child: const PrivacyScreen(),
               ),
 
-          '/notifications': (context) => const NotificationsScreen(),
+          '/notifications': (context) => NotificationScreen(),
         },
       );
     } else {
@@ -152,7 +152,7 @@ class App extends StatelessWidget {
                 child: const PrivacyScreen(),
               ),
 
-          '/notifications': (context) => const NotificationsScreen(),
+          '/notifications': (context) => NotificationScreen(),
         },
       );
     }
