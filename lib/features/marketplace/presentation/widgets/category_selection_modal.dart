@@ -4,32 +4,13 @@ import 'package:offgrid_nation_app/features/marketplace/domain/entities/category
 
 class CategorySelectionModal extends StatelessWidget {
   final List<CategoryEntity> categories;
+  final Future<void> Function(String categoryId) onCategorySelected;
 
-  const CategorySelectionModal({super.key, required this.categories});
-  // static const List<String> categories = [
-  //   'Antiques',
-  //   'Arts & Crafts',
-  //   'Auto parts',
-  //   'Books',
-  //   'Cars',
-  //   'Electronics',
-  //   'Furniture',
-  //   'Hardware',
-  //   'Health & Beauty',
-  //   'Home improvement',
-  //   'Housing for sale',
-  //   'Jewelry',
-  //   'Kids wear',
-  //   'Luggage & Bags',
-  //   'Men\'s wear',
-  //   'Miscellaneous',
-  //   'Music instruments',
-  //   'Patio & Garden',
-  //   'Pet supplies',
-  //   'Rentals',
-  //   'Sporting Goods',
-  //   'Toys',
-  // ];
+  const CategorySelectionModal({
+    super.key,
+    required this.categories,
+    required this.onCategorySelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,46 +18,53 @@ class CategorySelectionModal extends StatelessWidget {
       initialChildSize: 0.95,
       minChildSize: 0.8,
       maxChildSize: 0.95,
-      builder:
-          (_, controller) => Container(
-            padding: const EdgeInsets.only(top: 24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      builder: (_, controller) => Container(
+        padding: const EdgeInsets.only(top: 24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CupertinoSearchTextField(
+                placeholder: 'Search',
+              ),
             ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CupertinoSearchTextField(
-                    placeholder: 'Search',
-                    onChanged: (value) {
-                      // Optional: implement filtering here.
-                    },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Divider(height: 0),
-                Expanded(
-                  child: ListView.separated(
-                    controller: controller,
-                    itemCount: categories.length,
-                    separatorBuilder: (_, __) => const Divider(height: 0),
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      return ListTile(
-                        leading: const Icon(Icons.circle_outlined, size: 20),
-                        title: Text(category.title),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+            const SizedBox(height: 16),
+            const Divider(height: 0),
+            Expanded(
+              child: ListView.separated(
+                controller: controller,
+                itemCount: categories.length,
+                separatorBuilder: (_, __) => const Divider(height: 0),
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return ListTile(
+                    leading: const Icon(Icons.circle_outlined, size: 20),
+                    title: Text(category.title),
+                    onTap: () async {
+                      Navigator.pop(context); // Close the modal first
+
+                      // Show loader
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) => const Center(child: CircularProgressIndicator()),
                       );
+
+                      await onCategorySelected(category.id);
+
+                      if (context.mounted) Navigator.pop(context); // Close loader
                     },
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 }

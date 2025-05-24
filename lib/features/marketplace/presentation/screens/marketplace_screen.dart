@@ -15,13 +15,15 @@ class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
 
   @override
-  State<MarketplaceScreen> createState() => _MarketplaceScreenState();
+  State<MarketplaceScreen> createState() => MarketplaceScreenState();
 }
 
-class _MarketplaceScreenState extends State<MarketplaceScreen> {
+class MarketplaceScreenState extends State<MarketplaceScreen> {
   bool _isInitializing = true;
   String? _errorText;
   String? _userLocation;
+  String? _selectedCategoryId;
+  bool _isSearchActive = false;
   late final MarketplaceBloc _bloc;
 
   @override
@@ -33,6 +35,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       getCategoriesUseCase: sl(),
       getProductDetailsUseCase: sl(),
       myProductListUseCase: sl(),
+      deleteProductUseCase: sl(), 
+      searchProductsUseCase: sl(),
     );
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _fetchProductsWithLocation(),
@@ -58,7 +62,14 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       if (lat != null && lng != null) {
         final locationName = await LocationUtils.getReadableLocation(lat, lng);
         setState(() => _userLocation = locationName ?? "Unknown Location");
-        _bloc.add(FetchProductsRequested(latitude: lat, longitude: lng));
+        _bloc.add(
+          FetchProductsRequested(
+            latitude: lat,
+            longitude: lng,
+            categoryId: _selectedCategoryId,
+          ),
+        );
+
         setState(() => _isInitializing = false);
         return;
       }
@@ -75,6 +86,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   void dispose() {
     _bloc.close();
     super.dispose();
+  }
+
+  Future<void> setCategoryAndFetch(String categoryId) async {
+    _selectedCategoryId = categoryId;
+    await _fetchProductsWithLocation();
   }
 
   @override

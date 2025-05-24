@@ -37,6 +37,16 @@ class ProductDetailsEntity {
   });
 
   factory ProductDetailsEntity.fromJson(Map<String, dynamic> json) {
+    final dynamic ownerJson = json['owner'];
+    final OwnerEntity owner =
+        ownerJson is Map<String, dynamic>
+            ? OwnerEntity.fromJson(ownerJson)
+            : OwnerEntity(
+              userId: ownerJson.toString(),
+              username: 'Unknownt',
+              profilePicture: '',
+            );
+
     return ProductDetailsEntity(
       id: json['_id'],
       title: json['title'],
@@ -51,7 +61,7 @@ class ProductDetailsEntity {
       clickCount: json['clickCount'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      owner: OwnerEntity.fromJson(json['owner']),
+      owner: owner,
     );
   }
 }

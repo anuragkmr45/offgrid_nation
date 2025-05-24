@@ -38,8 +38,6 @@ class MarketplaceRepositoryImpl implements MarketplaceRepository {
   @override
   Future<ProductDetailsEntity> getProductDetails(String productId) async {
     final response = await remoteDataSource.getProductDetails(productId);
-
-    print('[==========response get product details========: $response]');
     return ProductDetailsEntity.fromJson(response);
   }
 
@@ -87,5 +85,31 @@ class MarketplaceRepositoryImpl implements MarketplaceRepository {
   Future<List<ProductEntity>> listMyProducts(MyProductFilter filter) async {
     final data = await remoteDataSource.listMyProducts(filter);
     return data.map<ProductEntity>((e) => ProductEntity.fromJson(e)).toList();
+  }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    return await remoteDataSource.deleteProduct(productId);
+  }
+
+  @override
+  Future<List<ProductEntity>> searchProducts({
+    required String query,
+    String? category,
+    String? sort,
+    double? lat,
+    double? lng,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    return await remoteDataSource.searchProducts(
+      query: query,
+      category: category,
+      sort: sort,
+      lat: lat,
+      lng: lng,
+      page: page,
+      limit: limit,
+    );
   }
 }

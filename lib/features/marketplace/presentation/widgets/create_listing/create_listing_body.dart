@@ -1,162 +1,3 @@
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
-// import 'package:offgrid_nation_app/core/utils/location_utils.dart';
-// import 'package:offgrid_nation_app/core/widgets/custom_button.dart';
-// import 'package:offgrid_nation_app/core/widgets/custom_input_field.dart';
-// import 'package:offgrid_nation_app/core/widgets/custom_modal.dart';
-// import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/media_picker_component.dart';
-
-// class CreateListingBody extends StatefulWidget {
-//   final List<File> selectedImages;
-//   final ValueChanged<List<File>> onMediaChanged;
-
-//   const CreateListingBody({
-//     super.key,
-//     required this.selectedImages,
-//     required this.onMediaChanged,
-//   });
-
-//   @override
-//   State<CreateListingBody> createState() => _CreateListingBodyState();
-// }
-
-// class _CreateListingBodyState extends State<CreateListingBody> {
-//   final titleController = TextEditingController();
-//   final priceController = TextEditingController();
-//   final descController = TextEditingController();
-//   final locationController = TextEditingController();
-
-//   final List<String> _conditions = [
-//     'New',
-//     'Used-Like New',
-//     'Used-Good',
-//     'Others',
-//   ];
-//   String? _selectedCondition;
-
-//   Future<void> _handleLocationInput() async {
-//     final hasPermission = await LocationUtils.requestLocationPermission();
-//     if (!hasPermission) {
-//       await LocationUtils.showLocationDeniedDialog(context);
-//       return;
-//     }
-
-//     await CustomModal.show(
-//       context: context,
-//       title: 'Location',
-//       content: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           ListTile(
-//             leading: const Icon(Icons.my_location),
-//             title: const Text('Use current location'),
-//             onTap: () async {
-//               Navigator.pop(context);
-//               final loc = await LocationUtils.getFormattedLocation();
-//               if (loc != null) {
-//                 setState(() => locationController.text = loc);
-//               }
-//             },
-//           ),
-//           ListTile(
-//             leading: const Icon(Icons.edit_location_alt),
-//             title: const Text('Type manually'),
-//             onTap: () => Navigator.pop(context),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView(
-//       children: [
-//         MediaPickerComponent(onMediaChanged: widget.onMediaChanged),
-//         const SizedBox(height: 20),
-
-//         CustomInputField(
-//           controller: titleController,
-//           placeholder: 'Enter Title',
-//         ),
-//         const SizedBox(height: 12),
-
-//         CustomInputField(
-//           controller: priceController,
-//           placeholder: 'Price',
-//           keyboardType: TextInputType.number,
-//         ),
-//         const SizedBox(height: 20),
-
-//         const Text(
-//           'Condition',
-//           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-//         ),
-//         const SizedBox(height: 8),
-
-//         Wrap(
-//           spacing: 8,
-//           runSpacing: 8,
-//           children:
-//               _conditions.map((label) {
-//                 final isSelected = label == _selectedCondition;
-//                 return GestureDetector(
-//                   onTap: () => setState(() => _selectedCondition = label),
-//                   child: Container(
-//                     padding: const EdgeInsets.symmetric(
-//                       horizontal: 12,
-//                       vertical: 8,
-//                     ),
-//                     decoration: BoxDecoration(
-//                       color:
-//                           isSelected
-//                               ? AppColors.primary
-//                               : const Color(0xFFEAEAEA),
-//                       borderRadius: BorderRadius.circular(20),
-//                     ),
-//                     child: Text(
-//                       label,
-//                       style: TextStyle(
-//                         fontSize: 13,
-//                         color: isSelected ? Colors.white : Colors.black,
-//                       ),
-//                     ),
-//                   ),
-//                 );
-//               }).toList(),
-//         ),
-//         const SizedBox(height: 20),
-
-//         CustomInputField(
-//           controller: descController,
-//           placeholder: 'Description.....',
-//           keyboardType: TextInputType.multiline,
-//         ),
-//         const SizedBox(height: 12),
-
-//         GestureDetector(
-//           onTap: _handleLocationInput,
-//           child: AbsorbPointer(
-//             child: CustomInputField(
-//               controller: locationController,
-//               placeholder: 'Location',
-//             ),
-//           ),
-//         ),
-
-//         const SizedBox(height: 24),
-//         CustomButton(
-//           onPressed: () {
-//             // TODO: Trigger publish
-//           },
-//           text: 'Publish',
-//           loading: false,
-//         ),
-//       ],
-//     );
-//   }
-// }
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -196,8 +37,8 @@ class _CreateListingBodyState extends State<CreateListingBody> {
   bool _isSubmitting = false;
   final List<String> _conditions = [
     'New',
-    'Used-Like New',
-    'Used-Good',
+    'Used - Like New',
+    'Used - Good',
     'Others',
   ];
   String? _selectedCondition;
@@ -378,10 +219,38 @@ class _CreateListingBodyState extends State<CreateListingBody> {
             title: const Text('Use current location'),
             onTap: () async {
               Navigator.pop(context);
+
+              setState(() {
+                locationController.text = 'Loading...';
+              });
+
               final loc = await LocationUtils.getFormattedLocation();
               if (loc != null) {
-                setState(() => locationController.text = loc);
+                final parts = loc.split(',');
+                if (parts.length == 2) {
+                  final lat = double.tryParse(parts[0].trim());
+                  final lng = double.tryParse(parts[1].trim());
+
+                  if (lat != null && lng != null) {
+                    final placeName = await LocationUtils.getReadableLocation(
+                      lat,
+                      lng,
+                    );
+
+                    setState(() {
+                      locationController.text =
+                          (placeName != null && placeName.isNotEmpty)
+                              ? placeName
+                              : 'Unknown location';
+                    });
+                    return;
+                  }
+                }
               }
+
+              setState(() {
+                locationController.text = 'Unknown location';
+              });
             },
           ),
           ListTile(
