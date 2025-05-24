@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/custom_loader.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
-import '../../widget/profile/user_profile_header.dart';
-import '../../widget/profile/user_followers_tab.dart';
-import '../../widget/profile/user_posts_tab.dart';
-import '../../widget/profile/user_following_tab.dart';
+// import '../../widget/profile/user_profile_header.dart';
+// import '../../widget/profile/user_followers_tab.dart';
+// import '../../widget/profile/user_posts_tab.dart';
+// import '../../widget/profile/user_following_tab.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -127,23 +127,23 @@ class _UserProfileScreenState extends State<UserProfileScreen>
             final posts = data['postsCount']?.toString() ?? '0';
 
             return Column(
-              children: [
-                ProfileHeader(userData: data),
-                const SizedBox(height: 10),
-                CupertinoSegmentedControl<int>(
-                  groupValue: _cupertinoTabIndex,
-                  children: {
-                    0: Text('Following $following'),
-                    1: Text('Posts $posts'),
-                    2: Text('Followers $followers'),
-                  },
-                  onValueChanged: _onCupertinoTabChange,
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: _getCupertinoTabContent(), // ✅ dynamic tab content
-                ),
-              ],
+              // children: [
+              //   ProfileHeader(userData: data),
+              //   const SizedBox(height: 10),
+              //   CupertinoSegmentedControl<int>(
+              //     groupValue: _cupertinoTabIndex,
+              //     children: {
+              //       0: Text('Following $following'),
+              //       1: Text('Posts $posts'),
+              //       2: Text('Followers $followers'),
+              //     },
+              //     onValueChanged: _onCupertinoTabChange,
+              //   ),
+              //   const SizedBox(height: 10),
+              //   Expanded(
+              //     child: _getCupertinoTabContent(), // ✅ dynamic tab content
+              //   ),
+              // ],
             );
           },
         ),
@@ -194,7 +194,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
             return Column(
               children: [
-                ProfileHeader(userData: data),
+                // ProfileHeader(userData: data),
                 TabBar(
                   controller: _tabController, // ✅ use the same controller
                   indicatorColor: AppColors.background,
@@ -211,9 +211,9 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                     controller:
                         _tabController, // ✅ FIX: controller added here too
                     children: const [
-                      FollowingTab(),
-                      PostsTab(),
-                      FollowersTab(),
+                      // FollowingTab(),
+                      // PostsTab(),
+                      // FollowersTab(),
                     ],
                   ),
                 ),
@@ -227,12 +227,12 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
   Widget _getCupertinoTabContent() {
     switch (_cupertinoTabIndex) {
-      case 0:
-        return const FollowingTab();
-      case 1:
-        return const PostsTab();
-      case 2:
-        return const FollowersTab();
+      // case 0:
+      //   return const FollowingTab();
+      // case 1:
+      //   return const PostsTab();
+      // case 2:
+      //   return const FollowersTab();
       default:
         return const SizedBox.shrink();
     }

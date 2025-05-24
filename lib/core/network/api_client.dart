@@ -20,8 +20,6 @@ class ApiClient {
     final uri = Uri.parse(
       baseUrl,
     ).resolve(endpoint).replace(queryParameters: queryParams);
-    print("---------uri-----------: $uri");
-    // print('➡️ GET request: $uri');
     final response = await _client.get(uri, headers: _buildHeaders(headers));
     return processResponse(response);
   }
