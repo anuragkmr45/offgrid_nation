@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/state/marketplace_state.dart';
-import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/product_card.dart';
+import '../product_card.dart';
 
 class ProductCardGrid extends StatelessWidget {
   const ProductCardGrid({super.key});

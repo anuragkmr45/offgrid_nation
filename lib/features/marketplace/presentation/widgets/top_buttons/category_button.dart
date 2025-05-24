@@ -6,6 +6,7 @@ import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/event/marketplace_event.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/state/marketplace_state.dart';
+import 'package:offgrid_nation_app/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/category_selection_modal.dart';
 
 class CategoryButton extends StatelessWidget {
@@ -31,7 +32,34 @@ class CategoryButton extends StatelessWidget {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder:
-                  (_) => CategorySelectionModal(categories: state.categories),
+                  (_) => CategorySelectionModal(
+                    categories: state.categories,
+                    onCategorySelected: (categoryId) async {
+                      final screenState =
+                          context
+                              .findAncestorStateOfType<
+                                MarketplaceScreenState
+                              >();
+                      if (screenState != null) {
+                        // Show loading while fetching new results
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder:
+                              (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        );
+
+                        await screenState.setCategoryAndFetch(categoryId);
+
+                        if (context.mounted)
+                          Navigator.pop(context); // Close loading dialog
+                        if (context.mounted)
+                          Navigator.pop(context); // Close category modal
+                      }
+                    },
+                  ),
             );
           });
         } else if (state is MarketplaceFailure) {

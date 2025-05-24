@@ -111,3 +111,35 @@ class FetchMyProductsRequested extends MarketplaceEvent {
   @override
   List<Object?> get props => [filter];
 }
+
+class DeleteProductRequested extends MarketplaceEvent {
+  final String productId;
+
+  const DeleteProductRequested(this.productId);
+
+  @override
+  List<Object?> get props => [productId];
+}
+
+class SearchProductsRequested extends MarketplaceEvent {
+  final String query;
+  final String? category;
+  final String? sort;
+  final double? lat;
+  final double? lng;
+  final int page;
+  final int limit;
+
+  const SearchProductsRequested({
+    required this.query,
+    this.category,
+    this.sort,
+    this.lat,
+    this.lng,
+    this.page = 1,
+    this.limit = 20,
+  });
+
+  @override
+  List<Object?> get props => [query, category, sort, lat, lng, page, limit];
+}

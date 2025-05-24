@@ -37,4 +37,15 @@ abstract class MarketplaceRepository {
   Future<List<CategoryEntity>> getCategories();
 
   Future<List<ProductEntity>> listMyProducts(MyProductFilter filter);
+
+  Future<void> deleteProduct(String productId);
+
+  Future<List<ProductEntity>> searchProducts({    
+    required String query,
+    String? category,
+    String? sort,
+    double? lat,
+    double? lng,
+    int page = 1,
+    int limit = 20});
 }

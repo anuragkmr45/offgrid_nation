@@ -59,7 +59,12 @@ class ApiConstants {
   static const String listCategoriesEndpoint = "/categories";
   static const String listMyProductsEndpoint = "/products/me/my-products";
   static const String searchProductsEndpoint = "/products/search";
-static const String deleteProductEndpoint = "/products/:productId";
+  static const String deleteProductEndpoint = "/products/:productId";
+  static const String changeProductStatusEndpoint =
+      "/products/:productId/status";
+  static const String editProductEndpoint = "/products/:productId";
+  static const String listProductsByUserEndpoint = "/products/user/:username";
+  static const String getCategoryDetailsEndpoint = "/categories/:id";
 
   // Notifications
   static const String getNotificationsEndpoint = "/notifications";

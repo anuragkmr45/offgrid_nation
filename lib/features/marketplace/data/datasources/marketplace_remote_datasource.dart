@@ -6,6 +6,7 @@ import 'package:offgrid_nation_app/core/session/auth_session.dart';
 import 'package:http/http.dart' as http;
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/category_entity.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/my_product_entity.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_entity.dart';
 
 abstract class MarketplaceRemoteDataSource {
   Future<Map<String, dynamic>> addProduct({
@@ -18,9 +19,7 @@ abstract class MarketplaceRemoteDataSource {
     required String lng,
     List<File>? pictures,
   });
-
   Future<Map<String, dynamic>> getProductDetails(String productId);
-
   Future<List<dynamic>> listProducts({
     required double latitude,
     required double longitude,
@@ -29,17 +28,23 @@ abstract class MarketplaceRemoteDataSource {
     String? sortBy,
     String? category,
   });
-
   Future<Map<String, dynamic>> addRating({
     required String productId,
     required int star,
   });
-
   Future<Map<String, dynamic>> getRatings(String productId);
-
   Future<List<CategoryEntity>> getCategories();
-
   Future<List<dynamic>> listMyProducts(MyProductFilter filter);
+  Future<void> deleteProduct(String productId);
+  Future<List<ProductEntity>> searchProducts({
+    required String query,
+    String? category,
+    String? sort,
+    double? lat,
+    double? lng,
+    int page,
+    int limit,
+  });
 }
 
 class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
@@ -117,13 +122,13 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
       }
 
       final streamedResponse = await request.send();
-      // Print form fields
+      // // Print form fields
       // print('Form Fields:');
       // request.fields.forEach((key, value) {
       //   print('$key: $value');
       // });
 
-      // Print file info
+      // // Print file info
       // if (request.files.isNotEmpty) {
       //   print('Attached Pictures:');
       //   for (var file in request.files) {
@@ -160,9 +165,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
         endpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
-
-      print("-------------response get producst dtkls ----------- $response");
-
+print("------------response--------- $response");
       if (response == null || response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid product details response');
       }
@@ -272,7 +275,6 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
     final token = await authSession.getSessionToken();
     try {
       if (token == null) throw const NetworkException('Unauthorized');
-
       final response = await apiClient.get(
         ApiConstants.listMyProductsEndpoint,
         headers: {'Authorization': 'Bearer $token'},
@@ -286,6 +288,69 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
       return response;
     } catch (e) {
       throw NetworkException('Fail to fetch own products: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    try {
+      final token = await authSession.getSessionToken();
+      if (token == null) throw const NetworkException('Unauthorized');
+
+      final endpoint = ApiConstants.deleteProductEndpoint.replaceAll(
+        ":productId",
+        productId,
+      );
+
+      await apiClient.delete(
+        endpoint,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (e) {
+      throw NetworkException('Delete product failed: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<List<ProductEntity>> searchProducts({
+    required String query,
+    String? category,
+    String? sort,
+    double? lat,
+    double? lng,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      if (query.trim().isEmpty) {
+        throw const NetworkException('Search query is required.');
+      }
+      print("==============================================================");
+      final token = await authSession.getSessionToken();
+      if (token == null) throw const NetworkException('Unauthorized');
+
+      final queryParams = {
+        'q': Uri.encodeComponent(query),
+        'page': page.toString(),
+        'limit': limit.toString(),
+        if (category != null) 'category': category,
+        if (sort != null) 'sort': sort,
+        if (lat != null) 'lat': lat.toString(),
+        if (lng != null) 'lng': lng.toString(),
+      };
+
+      final response = await apiClient.get(
+        ApiConstants.searchProductsEndpoint,
+        headers: {'Authorization': 'Bearer $token'},
+        queryParams: queryParams,
+      );
+      print("---------------response--search ---------- $response");
+      if (response is! List) {
+        throw const NetworkException('Invalid search products response');
+      }
+      return response.map((e) => ProductEntity.fromJson(e)).toList();
+    } catch (e) {
+      throw NetworkException('Search products failed: ${e.toString()}');
     }
   }
 }

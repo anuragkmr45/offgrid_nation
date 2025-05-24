@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_entity.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/usecases/delete_product_usecase.dart';
 // import 'package:offgrid_nation_app/features/marketplace/domain/usecases/add_rating_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_categories_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_product_details_usecase.dart';
@@ -7,6 +7,7 @@ import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_prod
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/list_products_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/my_product_list_usercase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/add_product_usecase.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/usecases/search_products_usecase.dart';
 import './event/marketplace_event.dart';
 import './state/marketplace_state.dart';
 
@@ -18,6 +19,8 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
   // final AddRatingUseCase addRatingUseCase;
   // final GetRatingsUseCase getRatingsUseCase;
   final MyProductListUseCase myProductListUseCase;
+  final DeleteProductUseCase deleteProductUseCase;
+  final SearchProductsUseCase searchProductsUseCase;
 
   MarketplaceBloc({
     required this.addProductUseCase,
@@ -25,6 +28,8 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     required this.getProductDetailsUseCase,
     required this.listProductsUseCase,
     required this.myProductListUseCase,
+    required this.deleteProductUseCase,
+    required this.searchProductsUseCase,
     // required this.addRatingUseCase,
     // required this.getRatingsUseCase,
   }) : super(MarketplaceInitial()) {
@@ -33,6 +38,8 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     on<FetchProductDetailsRequested>(_onFetchProductDetailsRequested);
     on<FetchProductsRequested>(_onFetchProductsRequested);
     on<FetchMyProductsRequested>(_onFetchMyProductsRequested);
+    on<DeleteProductRequested>(_onDeleteProductRequested);
+    on<SearchProductsRequested>(_onSearchProductsRequested);
     // on<FetchMyProductsRequested>(_onAddRatingRequested);
     // on<FetchMyProductsRequested>(_onFetchRatingsRequested);
   }
@@ -66,7 +73,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     emit(MarketplaceLoading());
     try {
       final product = await getProductDetailsUseCase(event.productId);
-      emit(ProductDetailsLoaded(product as ProductEntity));
+      emit(ProductDetailsLoaded(product));
     } catch (e) {
       emit(MarketplaceFailure(e.toString()));
     }
@@ -123,6 +130,39 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     }
   }
 
+  Future<void> _onDeleteProductRequested(
+    DeleteProductRequested event,
+    Emitter<MarketplaceState> emit,
+  ) async {
+    emit(MarketplaceLoading());
+    try {
+      await deleteProductUseCase(event.productId);
+      emit(MarketplaceLoaded(products: [])); // or refetch
+    } catch (e) {
+      emit(MarketplaceFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onSearchProductsRequested(
+    SearchProductsRequested event,
+    Emitter<MarketplaceState> emit,
+  ) async {
+    emit(MarketplaceLoading());
+    try {
+      final results = await searchProductsUseCase(
+        query: event.query,
+        category: event.category,
+        sort: event.sort,
+        lat: event.lat,
+        lng: event.lng,
+        page: event.page,
+        limit: event.limit,
+      );
+      emit(SearchProductsLoaded(results: results));
+    } catch (e) {
+      emit(MarketplaceFailure(e.toString()));
+    }
+  }
   // Future<void> _onAddRatingRequested(
   //   AddRatingRequested event,
   //   Emitter<MarketplaceState> emit,

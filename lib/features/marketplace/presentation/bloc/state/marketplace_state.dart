@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/category_entity.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_details_entity.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_entity.dart';
 
 abstract class MarketplaceState extends Equatable {
@@ -39,7 +40,7 @@ class CategoriesLoaded extends MarketplaceState {
 }
 
 class ProductDetailsLoaded extends MarketplaceState {
-  final ProductEntity product;
+  final ProductDetailsEntity product;
 
   ProductDetailsLoaded(this.product);
 
@@ -84,4 +85,13 @@ class MyProductsLoaded extends MarketplaceState {
 
   @override
   List<Object?> get props => [myProducts];
+}
+
+class SearchProductsLoaded extends MarketplaceState {
+  final List<ProductEntity> results;
+
+  SearchProductsLoaded({required this.results});
+
+  @override
+  List<Object?> get props => [results];
 }

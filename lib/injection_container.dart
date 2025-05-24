@@ -26,11 +26,13 @@ import 'package:offgrid_nation_app/features/marketplace/data/repositories/market
 import 'package:offgrid_nation_app/features/marketplace/domain/repositories/marketplace_repository.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/add_product_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/add_rating_usecase.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/usecases/delete_product_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_categories_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_product_details_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/get_ratings_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/list_products_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/usecases/my_product_list_usercase.dart';
+import 'package:offgrid_nation_app/features/marketplace/domain/usecases/search_products_usecase.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/add_post_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/content_remote_data_source.dart';
@@ -283,7 +285,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AddPostUseCase(repository: sl()));
   sl.registerFactory(() => AddPostBloc(addPostUseCase: sl()));
 
-  // market palce
+  // ─────────────────────────────────────────────────────────────────
+  // marketplace
+  // ─────────────────────────────────────────────────────────────────
   // Data source
   sl.registerLazySingleton<MarketplaceRemoteDataSource>(
     () => MarketplaceRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
@@ -302,6 +306,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetRatingsUseCase(sl()));
   sl.registerLazySingleton(() => GetCategoriesUseCase(sl()));
   sl.registerLazySingleton(() => MyProductListUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProductUseCase(sl()));
+  sl.registerLazySingleton(() => SearchProductsUseCase(sl()));
 
   // Bloc
   sl.registerFactory(
@@ -312,7 +318,9 @@ Future<void> init() async {
       // addRatingUseCase: sl(),
       // getRatingsUseCase: sl(),
       getCategoriesUseCase: sl(),
-      myProductListUseCase: sl(),
+      myProductListUseCase: sl(), 
+      deleteProductUseCase: sl(), 
+      searchProductsUseCase: sl(),
     ),
   );
 }
