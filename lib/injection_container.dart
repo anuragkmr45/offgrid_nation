@@ -36,14 +36,17 @@ import 'package:offgrid_nation_app/features/marketplace/domain/usecases/search_p
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/add_post_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/content_remote_data_source.dart';
+import 'package:offgrid_nation_app/features/root/data/datasources/notification_remote_datasource.dart';
 
 // profile
 import 'package:offgrid_nation_app/features/root/data/datasources/user_profile_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/add_post_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/content_repository_impl.dart';
+import 'package:offgrid_nation_app/features/root/data/repositories/notification_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/user_profile_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/add_post_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/content_repository.dart';
+import 'package:offgrid_nation_app/features/root/domain/repositories/notification_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/user_profile_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_comment_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_reply_usecase.dart';
@@ -52,6 +55,8 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_c
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_replies_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_comment_like_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_like_dislike_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/notification/fetch_notifications_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/notification/mark_notifications_read_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/posts/add_post_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_blocked_users_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_follower_requests_usecase.dart';
@@ -67,6 +72,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/up
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/update_toggle_follow_unfollow_usecase.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/add_post_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 
 // search
@@ -318,9 +324,29 @@ Future<void> init() async {
       // addRatingUseCase: sl(),
       // getRatingsUseCase: sl(),
       getCategoriesUseCase: sl(),
-      myProductListUseCase: sl(), 
-      deleteProductUseCase: sl(), 
+      myProductListUseCase: sl(),
+      deleteProductUseCase: sl(),
       searchProductsUseCase: sl(),
     ),
+  );
+
+  // ─────────────────────────────────────────────────────────────────
+  // notifications
+  // ─────────────────────────────────────────────────────────────────
+sl.registerLazySingleton<NotificationRemoteDataSource>(
+  () => NotificationRemoteDataSourceImpl(
+    apiClient: sl<ApiClient>(),
+    authSession: sl<AuthSession>(),
+  ),
+);
+
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => FetchNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationsReadUseCase(sl()));
+  sl.registerFactory(
+    () =>  NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
   );
 }

@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/reset_password_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/screens/product_details_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
-import 'package:offgrid_nation_app/features/root/presentation/screens/notification_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/screens/notification/notification_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/privacy_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/user_profile/profile_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/settings_screen.dart';
@@ -92,8 +93,11 @@ class App extends StatelessWidget {
                 create: (_) => di.sl<UserProfileBloc>(),
                 child: const PrivacyScreen(),
               ),
-
-          '/notifications': (context) => const NotificationsScreen(),
+          '/notifications':
+              (context) => BlocProvider<NotificationBloc>(
+                create: (_) => di.sl<NotificationBloc>(),
+                child: const NotificationScreen(),
+              ),
         },
       );
     } else {
@@ -151,8 +155,11 @@ class App extends StatelessWidget {
                 create: (_) => di.sl<UserProfileBloc>(),
                 child: const PrivacyScreen(),
               ),
-
-          '/notifications': (context) => const NotificationsScreen(),
+          '/notifications':
+              (context) => BlocProvider<NotificationBloc>(
+                create: (_) => di.sl<NotificationBloc>(),
+                child: const NotificationScreen(),
+              ),
         },
       );
     }

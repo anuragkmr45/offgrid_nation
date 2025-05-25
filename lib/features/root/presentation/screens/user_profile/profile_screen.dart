@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/custom_loader.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
-// import '../../widget/profile/profile_header.dart';
-// import '../../widget/profile/followers_tab.dart';
-// import '../../widget/profile/posts_tab.dart';
-// import '../../widget/profile/following_tab.dart';
+import '../../widget/profile/profile_header.dart';
+import '../../widget/profile/followers_tab.dart';
+import '../../widget/profile/posts_tab.dart';
+import '../../widget/profile/following_tab.dart';
 
 class MyProfileScreen extends StatefulWidget {
   final String? username;
@@ -194,10 +194,10 @@ class _MyProfileScreenState extends State<MyProfileScreen>
 
             return Column(
               children: [
-                // ProfileHeader(
-                //   userData: data,
-                //   isEditable: widget.username == null,
-                // ),
+                ProfileHeader(
+                  userData: data,
+                  isEditable: widget.username == null,
+                ),
                 TabBar(
                   controller: _tabController,
                   indicatorColor: AppColors.background,
@@ -213,9 +213,9 @@ class _MyProfileScreenState extends State<MyProfileScreen>
                   child: TabBarView(
                     controller: _tabController,
                     children: const [
-                      // FollowingTab(),
-                      // PostsTab(),
-                      // FollowersTab(),
+                      FollowingTab(),
+                      PostsTab(),
+                      FollowersTab(),
                     ],
                   ),
                 ),
