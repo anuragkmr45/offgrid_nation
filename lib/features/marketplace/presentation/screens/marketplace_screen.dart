@@ -23,7 +23,7 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
   String? _errorText;
   String? _userLocation;
   String? _selectedCategoryId;
-  bool _isSearchActive = false;
+  // bool _isSearchActive = false;
   late final MarketplaceBloc _bloc;
 
   @override

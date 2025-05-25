@@ -1,9 +1,14 @@
+// File: lib/features/marketplace/presentation/widgets/product_details/product_details_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_details_entity.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/event/marketplace_event.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/state/marketplace_state.dart';
+import 'package:offgrid_nation_app/core/widgets/custom_button.dart';
+import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/product_detils/product_details_info.dart';
+import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/product_detils/product_image_carousel.dart';
 import 'package:offgrid_nation_app/injection_container.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -26,7 +31,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       addProductUseCase: sl(),
       getCategoriesUseCase: sl(),
       getProductDetailsUseCase: sl(),
-      myProductListUseCase: sl(), deleteProductUseCase: sl(), 
+      myProductListUseCase: sl(),
+      deleteProductUseCase: sl(),
       searchProductsUseCase: sl(),
     );
     _bloc.add(FetchProductDetailsRequested(widget.productId));
@@ -44,6 +50,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       value: _bloc,
       child: Scaffold(
         appBar: AppBar(title: const Text("Product Details")),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: CustomButton(
+              text: "Chat with Seller",
+              onPressed: () {},
+              loading: false,
+            ),
+          ),
+        ),
         body: BlocBuilder<MarketplaceBloc, MarketplaceState>(
           builder: (context, state) {
             if (state is MarketplaceLoading) {
@@ -51,44 +67,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             }
 
             if (state is MarketplaceFailure || state is MarketplaceError) {
-              return const Center(
-                child: Text("Failed to load product details."),
-              );
+              return const Center(child: Text("Failed to load product details."));
             }
 
             if (state is ProductDetailsLoaded) {
               final ProductDetailsEntity product = state.product;
 
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.only(bottom: 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (product.images.isNotEmpty)
-                      Image.network(product.images[0], width: double.infinity),
-                    const SizedBox(height: 12),
-                    Text(
-                      product.title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(product.price, style: const TextStyle(fontSize: 18)),
-                    const SizedBox(height: 8),
-                    Text("Condition: ${product.condition}"),
-                    const SizedBox(height: 8),
-                    Text("Description: ${product.description}"),
-                    const SizedBox(height: 8),
-                    Text("Category: ${product.category.title}"),
-                    const SizedBox(height: 8),
-                    Text("Posted by: ${product.owner.username}"),
-                    const SizedBox(height: 8),
-                    Text("Views: ${product.clickCount}"),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Location: (${product.location.coordinates.join(", ")})",
-                    ),
+                    ProductImageCarousel(mediaUrls: product.images),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ProductDetailsInfo(product: product),
+                    )
                   ],
                 ),
               );

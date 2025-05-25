@@ -71,6 +71,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
 
+      print("------------------------------------------------------------------${lat + " " + lng}");
       if (title.length > 200) {
         throw const NetworkException('Title must be 200 characters or fewer.');
       }
@@ -187,7 +188,6 @@ print("------------response--------- $response");
     try {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
-      print("------------------------------------------------------------------");
       final queryParams = {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
@@ -202,9 +202,6 @@ print("------------response--------- $response");
         headers: {'Authorization': 'Bearer $token'},
         queryParams: queryParams,
       );
-      print(
-      "--------------------------------------------------------------------$response",
-    );
 
       if (response == null || response is! List) {
         throw const NetworkException('Invalid list products response');

@@ -32,6 +32,9 @@ class _CreateListingBodyState extends State<CreateListingBody> {
   final priceController = TextEditingController();
   final descController = TextEditingController();
   final locationController = TextEditingController();
+  double? _latitude;
+  double? _longitude;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _isSubmitting = false;
@@ -167,39 +170,89 @@ class _CreateListingBodyState extends State<CreateListingBody> {
       return;
     }
 
-    // Location format validation
-    final locText = locationController.text.trim();
-    if (!locText.contains(',')) {
-      _showError('Location must be in format: latitude,longitude');
+    // Location validation
+    if (_latitude == null || _longitude == null) {
+      _showError('Please select a valid location.');
       return;
     }
-
-    final parts = locText.split(',');
-    if (parts.length != 2) {
-      _showError('Location must include both latitude and longitude.');
-      return;
-    }
-
-    final lat = parts[0].trim();
-    final lng = parts[1].trim();
 
     // Start submitting and disable button
     setState(() => _isSubmitting = true);
 
-    // Dispatch Bloc event
+    // Dispatch Bloc event with correct lat/lng
     context.read<MarketplaceBloc>().add(
       AddProductRequested(
         pictures: widget.selectedImages,
-        title: titleController.text.trim().toString(),
-        price: priceController.text.trim().toString(),
-        condition: _selectedCondition!.toString(),
-        description: descController.text.trim().toString(),
-        category: _selectedCategoryId!.toString(),
-        lat: lat.toString(),
-        lng: lng.toString(),
+        title: titleController.text.trim(),
+        price: priceController.text.trim(),
+        condition: _selectedCondition!,
+        description: descController.text.trim(),
+        category: _selectedCategoryId!,
+        lat: _latitude!.toString(),
+        lng: _longitude!.toString(),
       ),
     );
   }
+
+  // void _handlePublish() {
+  //   // Validate form fields
+  //   final form = _formKey.currentState;
+  //   if (form == null || !form.validate()) {
+  //     _showError('Please fill in all required fields.');
+  //     return;
+  //   }
+
+  //   // Image validation
+  //   if (widget.selectedImages.isEmpty) {
+  //     _showError('Please select at least 1 image.');
+  //     return;
+  //   }
+
+  //   // Condition validation
+  //   if (_selectedCondition == null) {
+  //     _showError('Please select a product condition.');
+  //     return;
+  //   }
+
+  //   // Category validation
+  //   if (_selectedCategoryId == null) {
+  //     _showError('Please select a product category.');
+  //     return;
+  //   }
+
+  //   // Location format validation
+  //   final locText = locationController.text.trim();
+  //   if (!locText.contains(',')) {
+  //     _showError('Location must be in format: latitude,longitude');
+  //     return;
+  //   }
+
+  //   final parts = locText.split(',');
+  //   if (parts.length != 2) {
+  //     _showError('Location must include both latitude and longitude.');
+  //     return;
+  //   }
+
+  //   final lat = parts[0].trim();
+  //   final lng = parts[1].trim();
+
+  //   // Start submitting and disable button
+  //   setState(() => _isSubmitting = true);
+
+  //   // Dispatch Bloc event
+  //   context.read<MarketplaceBloc>().add(
+  //     AddProductRequested(
+  //       pictures: widget.selectedImages,
+  //       title: titleController.text.trim().toString(),
+  //       price: priceController.text.trim().toString(),
+  //       condition: _selectedCondition!.toString(),
+  //       description: descController.text.trim().toString(),
+  //       category: _selectedCategoryId!.toString(),
+  //       lat: lat.toString(),
+  //       lng: lng.toString(),
+  //     ),
+  //   );
+  // }
 
   Future<void> _handleLocationInput() async {
     final hasPermission = await LocationUtils.requestLocationPermission();
@@ -219,7 +272,6 @@ class _CreateListingBodyState extends State<CreateListingBody> {
             title: const Text('Use current location'),
             onTap: () async {
               Navigator.pop(context);
-
               setState(() {
                 locationController.text = 'Loading...';
               });
@@ -236,8 +288,9 @@ class _CreateListingBodyState extends State<CreateListingBody> {
                       lat,
                       lng,
                     );
-
                     setState(() {
+                      _latitude = lat;
+                      _longitude = lng;
                       locationController.text =
                           (placeName != null && placeName.isNotEmpty)
                               ? placeName
@@ -249,19 +302,133 @@ class _CreateListingBodyState extends State<CreateListingBody> {
               }
 
               setState(() {
+                _latitude = null;
+                _longitude = null;
                 locationController.text = 'Unknown location';
               });
             },
           ),
           ListTile(
             leading: const Icon(Icons.edit_location_alt),
-            title: const Text('Type manually'),
-            onTap: () => Navigator.pop(context),
+            title: const Text(
+              'Type manually (lat,lng)',
+              style: TextStyle(fontSize: 14),
+            ),
+            onTap: () async {
+              Navigator.pop(context);
+
+              final controller = TextEditingController();
+              final entered = await showDialog<String>(
+                context: context,
+                builder:
+                    (context) => AlertDialog(
+                      title: const Text('Enter Coordinates'),
+                      content: TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter latitude,longitude',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed:
+                              () => Navigator.of(context).pop(controller.text),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+              );
+
+              if (entered != null && entered.contains(',')) {
+                final parts = entered.split(',');
+                final lat = double.tryParse(parts[0].trim());
+                final lng = double.tryParse(parts[1].trim());
+
+                if (lat != null && lng != null) {
+                  final place = await LocationUtils.getReadableLocation(
+                    lat,
+                    lng,
+                  );
+                  setState(() {
+                    _latitude = lat;
+                    _longitude = lng;
+                    locationController.text =
+                        (place != null && place.isNotEmpty)
+                            ? place
+                            : 'Lat: $lat, Lng: $lng';
+                  });
+                } else {
+                  _showError('Invalid coordinates entered.');
+                }
+              }
+            },
           ),
         ],
       ),
     );
   }
+
+  // Future<void> _handleLocationInput() async {
+  //   final hasPermission = await LocationUtils.requestLocationPermission();
+  //   if (!hasPermission) {
+  //     await LocationUtils.showLocationDeniedDialog(context);
+  //     return;
+  //   }
+
+  //   await CustomModal.show(
+  //     context: context,
+  //     title: 'Location',
+  //     content: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         ListTile(
+  //           leading: const Icon(Icons.my_location),
+  //           title: const Text('Use current location'),
+  //           onTap: () async {
+  //             Navigator.pop(context);
+
+  //             setState(() {
+  //               locationController.text = 'Loading...';
+  //             });
+
+  //             final loc = await LocationUtils.getFormattedLocation();
+  //             if (loc != null) {
+  //               final parts = loc.split(',');
+  //               if (parts.length == 2) {
+  //                 final lat = double.tryParse(parts[0].trim());
+  //                 final lng = double.tryParse(parts[1].trim());
+
+  //                 if (lat != null && lng != null) {
+  //                   final placeName = await LocationUtils.getReadableLocation(
+  //                     lat,
+  //                     lng,
+  //                   );
+
+  //                   setState(() {
+  //                     locationController.text =
+  //                         (placeName != null && placeName.isNotEmpty)
+  //                             ? placeName
+  //                             : 'Unknown location';
+  //                   });
+  //                   return;
+  //                 }
+  //               }
+  //             }
+
+  //             setState(() {
+  //               locationController.text = 'Unknown location';
+  //             });
+  //           },
+  //         ),
+  //         ListTile(
+  //           leading: const Icon(Icons.edit_location_alt),
+  //           title: const Text('Type manually'),
+  //           onTap: () => Navigator.pop(context),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
