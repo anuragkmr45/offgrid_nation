@@ -333,9 +333,12 @@ Future<void> init() async {
   // ─────────────────────────────────────────────────────────────────
   // notifications
   // ─────────────────────────────────────────────────────────────────
-  sl.registerLazySingleton<NotificationRemoteDataSource>(
-    () => NotificationRemoteDataSourceImpl(sl()),
-  );
+sl.registerLazySingleton<NotificationRemoteDataSource>(
+  () => NotificationRemoteDataSourceImpl(
+    apiClient: sl<ApiClient>(),
+    authSession: sl<AuthSession>(),
+  ),
+);
 
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(sl()),

@@ -1,10 +1,34 @@
 import 'package:equatable/equatable.dart';
 
+// class NotificationEntity extends Equatable {
+//   final String id;
+//   final String type;
+//   final String fromUser;
+//   final String toUser;
+//   final String entityId;
+//   final Map<String, dynamic>? meta;
+//   final bool read;
+//   final DateTime createdAt;
+
+//   const NotificationEntity({
+//     required this.id,
+//     required this.type,
+//     required this.fromUser,
+//     required this.toUser,
+//     required this.entityId,
+//     required this.meta,
+//     required this.read,
+//     required this.createdAt,
+//   });
+
+//   @override
+//   List<Object?> get props => [id, type, fromUser, toUser, entityId, meta, read, createdAt];
+// }
 class NotificationEntity extends Equatable {
   final String id;
   final String type;
-  final String fromUser;
-  final String toUser;
+  final String? fromUserId;
+  final String? toUserId;
   final String entityId;
   final Map<String, dynamic>? meta;
   final bool read;
@@ -13,8 +37,8 @@ class NotificationEntity extends Equatable {
   const NotificationEntity({
     required this.id,
     required this.type,
-    required this.fromUser,
-    required this.toUser,
+    required this.fromUserId,
+    required this.toUserId,
     required this.entityId,
     required this.meta,
     required this.read,
@@ -22,5 +46,5 @@ class NotificationEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, type, fromUser, toUser, entityId, meta, read, createdAt];
+  List<Object?> get props => [id, type, fromUserId, toUserId, entityId, meta, read, createdAt];
 }
