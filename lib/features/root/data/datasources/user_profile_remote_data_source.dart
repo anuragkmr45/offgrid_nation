@@ -24,7 +24,11 @@ abstract class UserProfileRemoteDataSource {
   Future<Map<String, dynamic>> updateToggleFollowUnfollow(String userId);
   Future<Map<String, dynamic>> updateToggleBlockUnblock(String userId);
   Future<Map<String, dynamic>> updateAcceptFollowRequest(String userId);
-  Future<Map<String, dynamic>> getPostsByUsername(String username);
+  Future<Map<String, dynamic>> getPostsByUsername(
+    String username, {
+    int limit,
+    String? cursor,
+  });
 }
 
 class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
@@ -321,7 +325,10 @@ class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> getPostsByUsername(String username) async {
+  Future<Map<String, dynamic>> getPostsByUsername(String username, {
+    int limit = 20,
+    String? cursor,
+  }) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Not authorized');
 

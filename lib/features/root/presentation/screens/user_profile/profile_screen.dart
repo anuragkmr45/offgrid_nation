@@ -5,14 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/custom_loader.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
-import '../../widget/profile/profile_header.dart';
-import '../../widget/profile/followers_tab.dart';
-import '../../widget/profile/posts_tab.dart';
-import '../../widget/profile/following_tab.dart';
+import 'package:offgrid_nation_app/features/root/presentation/widget/profile/profile/profile_tabs_cupertino.dart';
+import 'package:offgrid_nation_app/features/root/presentation/widget/profile/profile/profile_tabs_material.dart';
 
 class MyProfileScreen extends StatefulWidget {
   final String? username;
-
   const MyProfileScreen({super.key, this.username});
 
   @override
@@ -22,59 +19,54 @@ class MyProfileScreen extends StatefulWidget {
 class _MyProfileScreenState extends State<MyProfileScreen>
     with SingleTickerProviderStateMixin {
   int _cupertinoTabIndex = 0;
-  late TabController _tabController;
+  late final TabController _tabController;
   int _lastTabIndex = -1;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this)
-      ..addListener(_handleTabChange);
+      ..addListener(_onTabChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.username != null) {
-        context.read<UserProfileBloc>().add(
-          FetchUserProfileById(widget.username!),
-        );
-      } else {
-        context.read<UserProfileBloc>().add(const FetchProfileRequested());
-      }
+      final bloc = context.read<UserProfileBloc>();
+      widget.username != null
+          ? bloc.add(FetchUserProfileById(widget.username!))
+          : bloc.add(const FetchProfileRequested(limit: 10));
     });
   }
 
-  void _handleTabChange() {
-    if (!_tabController.indexIsChanging &&
-        _lastTabIndex != _tabController.index) {
+  bool _hasFetchedFollowing = false;
+  bool _hasFetchedFollowers = false;
+
+  void _onTabChanged() {
+    if (_tabController.index != _lastTabIndex) {
       _lastTabIndex = _tabController.index;
-      final state = context.read<UserProfileBloc>().state;
-      final username = widget.username ?? state.profileData?['username'];
+      final username =
+          widget.username ??
+          context.read<UserProfileBloc>().state.profileData?['username'];
       if (username == null || username.isEmpty) return;
 
-      switch (_tabController.index) {
-        case 0:
-          context.read<UserProfileBloc>().add(FetchFollowingRequest(username));
-          break;
-        case 2:
-          context.read<UserProfileBloc>().add(FetchFollowersRequest(username));
-          break;
+      if (_tabController.index == 0 && !_hasFetchedFollowing) {
+        _hasFetchedFollowing = true;
+        context.read<UserProfileBloc>().add(FetchFollowingRequest(username));
+      } else if (_tabController.index == 2 && !_hasFetchedFollowers) {
+        _hasFetchedFollowers = true;
+        context.read<UserProfileBloc>().add(FetchFollowersRequest(username));
       }
     }
   }
 
   void _onCupertinoTabChange(int index) {
     setState(() => _cupertinoTabIndex = index);
-
     final state = context.read<UserProfileBloc>().state;
     final username = widget.username ?? state.profileData?['username'];
     if (username == null || username.isEmpty) return;
 
-    switch (index) {
-      case 0:
-        context.read<UserProfileBloc>().add(FetchFollowingRequest(username));
-        break;
-      case 2:
-        context.read<UserProfileBloc>().add(FetchFollowersRequest(username));
-        break;
+    if (index == 0) {
+      context.read<UserProfileBloc>().add(FetchFollowingRequest(username));
+    } else if (index == 2) {
+      context.read<UserProfileBloc>().add(FetchFollowersRequest(username));
     }
   }
 
@@ -86,10 +78,10 @@ class _MyProfileScreenState extends State<MyProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Platform.isIOS ? _buildCupertinoPage() : _buildMaterialPage();
+    return Platform.isIOS ? _buildCupertinoView() : _buildMaterialView();
   }
 
-  Widget _buildCupertinoPage() {
+  Widget _buildCupertinoView() {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(
@@ -117,38 +109,11 @@ class _MyProfileScreenState extends State<MyProfileScreen>
               );
             }
 
-            final followers = data?['followersCount']?.toString() ?? '0';
-            final following = data?['followingCount']?.toString() ?? '0';
-            final posts = data?['postsCount']?.toString() ?? '0';
-
-            return Column(
-              children: [
-                // ProfileHeader(
-                //   userData: data!,
-                //   isEditable: widget.username == null,
-                // ),
-                const SizedBox(height: 10),
-                CupertinoSegmentedControl<int>(
-                  groupValue: _cupertinoTabIndex,
-                  children: {
-                    0: Text('Following $following'),
-                    1: Text('Posts $posts'),
-                    2: Text('Followers $followers'),
-                  },
-                  onValueChanged: _onCupertinoTabChange,
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: IndexedStack(
-                    index: _cupertinoTabIndex,
-                    children: const [
-                      // FollowingTab(),
-                      // PostsTab(),
-                      // FollowersTab(),
-                    ],
-                  ),
-                ),
-              ],
+            return ProfileTabsCupertino(
+              data: data,
+              tabIndex: _cupertinoTabIndex,
+              onTabChange: _onCupertinoTabChange,
+              isEditable: widget.username == null,
             );
           },
         ),
@@ -156,7 +121,7 @@ class _MyProfileScreenState extends State<MyProfileScreen>
     );
   }
 
-  Widget _buildMaterialPage() {
+  Widget _buildMaterialView() {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
@@ -188,38 +153,10 @@ class _MyProfileScreenState extends State<MyProfileScreen>
               );
             }
 
-            final followers = data['followersCount']?.toString() ?? '0';
-            final following = data['followingCount']?.toString() ?? '0';
-            final posts = data['postsCount']?.toString() ?? '0';
-
-            return Column(
-              children: [
-                ProfileHeader(
-                  userData: data,
-                  isEditable: widget.username == null,
-                ),
-                TabBar(
-                  controller: _tabController,
-                  indicatorColor: AppColors.background,
-                  labelColor: AppColors.background,
-                  unselectedLabelColor: AppColors.background,
-                  tabs: [
-                    Tab(child: Text('Following $following')),
-                    Tab(child: Text('Posts $posts')),
-                    Tab(child: Text('Followers $followers')),
-                  ],
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: const [
-                      FollowingTab(),
-                      PostsTab(),
-                      FollowersTab(),
-                    ],
-                  ),
-                ),
-              ],
+            return ProfileTabsMaterial(
+              data: data,
+              tabController: _tabController,
+              isEditable: widget.username == null,
             );
           },
         ),

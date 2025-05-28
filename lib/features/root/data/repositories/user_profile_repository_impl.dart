@@ -17,7 +17,6 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   @override
   Future<Map<String, dynamic>> getUserProfileById(String userId) async {
     final res = await remoteDataSource.getUserProfileById(userId);
-    print("---------------response-------------------: $res");
     return res;
   }
 
@@ -71,7 +70,10 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getPostsByUsername(String username) async {
-    return await remoteDataSource.getPostsByUsername(username);
+  Future<Map<String, dynamic>> getPostsByUsername(String username, {
+    int limit = 20,
+    String? cursor,
+  }) async {
+    return await remoteDataSource.getPostsByUsername(username, limit: limit, cursor: cursor);
   }
 }

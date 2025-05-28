@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/custom_loader.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
-import '../../widget/profile/user_profile_header.dart';
-import '../../widget/profile/user_followers_tab.dart';
-import '../../widget/profile/user_posts_tab.dart';
-import '../../widget/profile/user_following_tab.dart';
+import '../../widget/profile/user-profile/user_profile_header.dart';
+import '../../widget/profile/user-profile/user_followers_tab.dart';
+import '../../widget/profile/user-profile/user_posts_tab.dart';
+import '../../widget/profile/user-profile/user_following_tab.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -32,7 +32,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
 
       context.read<UserProfileBloc>().add(FetchUserProfileById(_username!));
       context.read<UserProfileBloc>().add(
-        FetchPostsByUsername(_username!),
+        FetchPostsByUsername(username: _username!),
       ); // ✅ fetch posts
     }
   }

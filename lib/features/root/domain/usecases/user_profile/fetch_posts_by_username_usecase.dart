@@ -5,7 +5,15 @@ class FetchPostsByUsernameUsecase {
 
   FetchPostsByUsernameUsecase(this.repository);
 
-  Future<Map<String, dynamic>> call(String username) async {
-    return await repository.getPostsByUsername(username);
+  Future<Map<String, dynamic>> call(
+    String username, {
+    int limit = 10,
+    String? cursor,
+  }) async {
+    return await repository.getPostsByUsername(
+      username,
+      limit: limit,
+      cursor: cursor,
+    );
   }
 }
