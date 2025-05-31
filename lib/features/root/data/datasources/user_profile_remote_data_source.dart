@@ -125,11 +125,11 @@ class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
     try {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Not authorized');
-
+      
       final uri = Uri.parse(
         '${apiClient.baseUrl}${ApiConstants.updateProfilePhotoEndpoint}',
       );
-      print('---------uri progile------------- $uri');
+      
       final request = http.MultipartRequest('POST', uri)
         ..headers['Authorization'] = 'Bearer $token';
 
@@ -150,7 +150,7 @@ class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
 
       final response = await request.send();
       final responseBody = await http.Response.fromStream(response);
-print("-------responseBody oofileu photot --------$responseBody");
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final data = apiClient.processResponse(responseBody);
         return data['profilePictureUrl'] ?? '';
@@ -176,8 +176,6 @@ print("-------responseBody oofileu photot --------$responseBody");
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      print("----------getFollowers response------------: $response");
-
       if (response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid response format');
       }
@@ -198,7 +196,6 @@ print("-------responseBody oofileu photot --------$responseBody");
         ApiConstants.getFollowingEndpoint.replaceFirst(':username', userId),
         headers: {'Authorization': 'Bearer $token'},
       );
-      print("----------getFollowing response------------: $response");
 
       if (response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid response format');
@@ -220,7 +217,7 @@ print("-------responseBody oofileu photot --------$responseBody");
         ApiConstants.getBlockedUsersEndpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
-      print("response:::::::::::::::::::::::::::::::::::::$response");
+      
       if (response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid response format');
       }
@@ -268,8 +265,6 @@ print("-------responseBody oofileu photot --------$responseBody");
       body:
           {}, // ✅ Explicit empty JSON body to satisfy your ApiClient's encoder
     );
-
-    print("------------response----------------: $response");
 
     if (response is! Map<String, dynamic>) {
       throw const NetworkException('Invalid response format');
