@@ -5,18 +5,14 @@ class ReplyModel {
   final String commentId;
   final UserRef user;
   final String content;
-  final List<String> likes;
   final DateTime createdAt;
-  final DateTime updatedAt;
 
   ReplyModel({
     required this.id,
     required this.commentId,
     required this.user,
     required this.content,
-    required this.likes,
     required this.createdAt,
-    required this.updatedAt,
   });
 
   factory ReplyModel.fromJson(Map<String, dynamic> json) {
@@ -25,9 +21,7 @@ class ReplyModel {
       commentId: json['commentId'],
       user: UserRef.fromJson(json['userId']),
       content: json['content'],
-      likes: List<String>.from(json['likes'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 }

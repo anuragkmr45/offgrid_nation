@@ -302,9 +302,7 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
       commentId: event.commentId,
       user: currentUser,
       content: event.content,
-      likes: [],
       createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
     );
 
     final optimisticReplies = [tempReply, ...?state.replies];

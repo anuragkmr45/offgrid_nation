@@ -39,7 +39,6 @@ class ContentRepositoryImpl implements ContentRepository {
   @override
   Future<CommentModel> addComment(String postId, String content) async {
     final a = await remote.addComment(postId, content);
-    print('-----------------in repo anksdjfnksdjk---------- $a');
     return a;
   }
 

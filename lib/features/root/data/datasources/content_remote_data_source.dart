@@ -57,7 +57,6 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
     if (response is! Map<String, dynamic>) {
       throw const NetworkException('Invalid feed response format');
     }
-    print('---response feess ---------------- $response');
     return response;
   }
 
@@ -81,7 +80,6 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
     if (response is! Map<String, dynamic>) {
       throw const NetworkException('Invalid like/unlike response format');
     }
-    print('--------------response like------------------ $response');
     return response;
   }
 
@@ -104,7 +102,7 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
       headers: {'Authorization': 'Bearer $token'},
       queryParams: {'limit': '$limit', if (cursor != null) 'cursor': cursor},
     );
-
+    
     if (response is! Map<String, dynamic> ||
         response['comments'] is! List<dynamic>) {
       throw const NetworkException('Invalid comment response format');

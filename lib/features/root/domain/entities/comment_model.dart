@@ -10,10 +10,8 @@ class CommentModel {
   final int repliesCount;
   final DateTime createdAt;
   final DateTime updatedAt;
-  List<ReplyModel> replies = []; // frontend-added list
-  bool showAllReplies = false; // frontend-controlled UI flag
-
-  /// ✅ Optional isLiked flag (for current user interaction)
+  List<ReplyModel> replies = [];
+  bool showAllReplies = false;
   final bool isLiked;
 
   CommentModel({
@@ -25,10 +23,28 @@ class CommentModel {
     required this.repliesCount,
     required this.createdAt,
     required this.updatedAt,
-    this.isLiked = false, // ✅ default
+    this.isLiked = false,
   });
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
+    final latestRepliesJson = json['latestReplies'] as List<dynamic>? ?? [];
+    final parsedReplies =
+        latestRepliesJson
+            .map(
+              (e) => ReplyModel(
+                commentId: json['_id'],
+                content: e['replyContent'],
+                createdAt: DateTime.parse(e['createdAt']),
+                user: UserRef(
+                  id: e['userId'],
+                  username: e['username'] ?? '',
+                  fullName: e['fullName'] ?? '',
+                  profilePicture: e['profilePicture'] ?? '',
+                ), id: ''
+              ),
+            )
+            .toList();
+
     return CommentModel(
       id: json['_id'],
       postId: json['postId'],
@@ -38,11 +54,10 @@ class CommentModel {
       repliesCount: json['repliesCount'] ?? 0,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      isLiked: false, // ✅ can be set from frontend logic if needed
-    );
+      isLiked: false,
+    )..replies = parsedReplies;
   }
 
-  /// ✅ Add copyWith for UI updates
   CommentModel copyWith({
     List<String>? likes,
     int? repliesCount,
