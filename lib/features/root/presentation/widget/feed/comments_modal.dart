@@ -23,8 +23,10 @@ class CommentModal extends StatefulWidget {
 
 class _CommentModalState extends State<CommentModal> {
   final TextEditingController _commentController = TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
   final Set<String> _loadingRepliesFor = {};
   final Map<String, List<ReplyModel>> _fetchedReplies = {};
+  String? _activeReplyCommentId;
 
   @override
   void initState() {
@@ -46,10 +48,34 @@ class _CommentModalState extends State<CommentModal> {
     );
   }
 
+  void _submitReply(String commentId) {
+    final text = _replyController.text.trim();
+    if (text.isEmpty) return;
+    _replyController.clear();
+    FocusScope.of(context).unfocus();
+    context.read<ContentBloc>().add(
+      AddReplyRequested(
+        commentId: commentId,
+        content: text,
+        context: context,
+      ),
+    );
+    setState(() {
+      _activeReplyCommentId = null;
+    });
+  }
+
   void _toggleLikeComment(String commentId) {
     context.read<ContentBloc>().add(
       ToggleCommentLikeRequested(commentId: commentId, context: context),
     );
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    _replyController.dispose();
+    super.dispose();
   }
 
   @override
@@ -181,11 +207,9 @@ class _CommentModalState extends State<CommentModal> {
                               try {
                                 final replies = await context.read<ContentBloc>()
                                     .fetchRepliesUsecase(commentId: comment.id);
-
                                 setState(() {
                                   _fetchedReplies[comment.id] = replies;
                                   _loadingRepliesFor.remove(comment.id);
-
                                   final updatedComments = [...?state.comments];
                                   final i = updatedComments.indexWhere((c) => c.id == comment.id);
                                   updatedComments[i] =
@@ -206,6 +230,34 @@ class _CommentModalState extends State<CommentModal> {
                               style: TextStyle(color: Colors.blue),
                             ),
                           ),
+                  ),
+                if (_activeReplyCommentId == comment.id)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 48, top: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _replyController,
+                            autofocus: true,
+                            decoration: InputDecoration(
+                              hintText: "Write a reply...",
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (_) => _submitReply(comment.id),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: () => _submitReply(comment.id),
+                        )
+                      ],
+                    ),
                   ),
               ],
             );
@@ -281,6 +333,24 @@ class _CommentModalState extends State<CommentModal> {
                         style: TextStyle(
                           fontSize: 13,
                           color: comment.isLiked ? Colors.red : Colors.grey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _activeReplyCommentId = comment.id;
+                          _replyController.clear();
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        });
+                      },
+                      child: const Text(
+                        "Reply",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
