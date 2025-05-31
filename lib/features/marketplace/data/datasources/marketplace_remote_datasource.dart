@@ -71,7 +71,6 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
 
-      print("------------------------------------------------------------------${lat + " " + lng}");
       if (title.length > 200) {
         throw const NetworkException('Title must be 200 characters or fewer.');
       }
@@ -139,13 +138,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
 
       final response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode == 201) {
         return apiClient.processResponse(response);
-      } else {
-        return apiClient.processResponse(
-          response,
-        ); // handles 400, 401, 413 properly
-      }
     } catch (e) {
       throw NetworkException('Add product failed: ${e.toString()}');
     }
@@ -166,7 +159,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
         endpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
-print("------------response--------- $response");
+      
       if (response == null || response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid product details response');
       }
@@ -325,10 +318,9 @@ print("------------response--------- $response");
       if (query.trim().isEmpty) {
         throw const NetworkException('Search query is required.');
       }
-      print("==============================================================");
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
-
+      
       final queryParams = {
         'q': Uri.encodeComponent(query),
         'page': page.toString(),
@@ -344,7 +336,7 @@ print("------------response--------- $response");
         headers: {'Authorization': 'Bearer $token'},
         queryParams: queryParams,
       );
-      print("---------------response--search ---------- $response");
+      
       if (response is! List) {
         throw const NetworkException('Invalid search products response');
       }

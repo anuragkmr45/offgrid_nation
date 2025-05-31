@@ -66,3 +66,26 @@ Your job is to build the **entire feature pipeline** for the given API in Flutte
 
 ### 🧩 API TO IMPLEMENT (PUT HERE AFTER PROMPT):
 
+
+
+
+permissionsd 
+<!-- Internet access (already added) -->
+<uses-permission android:name="android.permission.INTERNET"/>
+
+<!-- Location permissions -->
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+<!-- Camera access -->
+<uses-permission android:name="android.permission.CAMERA"/>
+
+<!-- For gallery access -->
+<!-- For Android 13+ (API 33+) -->
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+<uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+
+<!-- For Android 12 and below -->
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                 android:maxSdkVersion="28"/>

@@ -194,66 +194,6 @@ class _CreateListingBodyState extends State<CreateListingBody> {
     );
   }
 
-  // void _handlePublish() {
-  //   // Validate form fields
-  //   final form = _formKey.currentState;
-  //   if (form == null || !form.validate()) {
-  //     _showError('Please fill in all required fields.');
-  //     return;
-  //   }
-
-  //   // Image validation
-  //   if (widget.selectedImages.isEmpty) {
-  //     _showError('Please select at least 1 image.');
-  //     return;
-  //   }
-
-  //   // Condition validation
-  //   if (_selectedCondition == null) {
-  //     _showError('Please select a product condition.');
-  //     return;
-  //   }
-
-  //   // Category validation
-  //   if (_selectedCategoryId == null) {
-  //     _showError('Please select a product category.');
-  //     return;
-  //   }
-
-  //   // Location format validation
-  //   final locText = locationController.text.trim();
-  //   if (!locText.contains(',')) {
-  //     _showError('Location must be in format: latitude,longitude');
-  //     return;
-  //   }
-
-  //   final parts = locText.split(',');
-  //   if (parts.length != 2) {
-  //     _showError('Location must include both latitude and longitude.');
-  //     return;
-  //   }
-
-  //   final lat = parts[0].trim();
-  //   final lng = parts[1].trim();
-
-  //   // Start submitting and disable button
-  //   setState(() => _isSubmitting = true);
-
-  //   // Dispatch Bloc event
-  //   context.read<MarketplaceBloc>().add(
-  //     AddProductRequested(
-  //       pictures: widget.selectedImages,
-  //       title: titleController.text.trim().toString(),
-  //       price: priceController.text.trim().toString(),
-  //       condition: _selectedCondition!.toString(),
-  //       description: descController.text.trim().toString(),
-  //       category: _selectedCategoryId!.toString(),
-  //       lat: lat.toString(),
-  //       lng: lng.toString(),
-  //     ),
-  //   );
-  // }
-
   Future<void> _handleLocationInput() async {
     final hasPermission = await LocationUtils.requestLocationPermission();
     if (!hasPermission) {
@@ -368,75 +308,12 @@ class _CreateListingBodyState extends State<CreateListingBody> {
     );
   }
 
-  // Future<void> _handleLocationInput() async {
-  //   final hasPermission = await LocationUtils.requestLocationPermission();
-  //   if (!hasPermission) {
-  //     await LocationUtils.showLocationDeniedDialog(context);
-  //     return;
-  //   }
-
-  //   await CustomModal.show(
-  //     context: context,
-  //     title: 'Location',
-  //     content: Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         ListTile(
-  //           leading: const Icon(Icons.my_location),
-  //           title: const Text('Use current location'),
-  //           onTap: () async {
-  //             Navigator.pop(context);
-
-  //             setState(() {
-  //               locationController.text = 'Loading...';
-  //             });
-
-  //             final loc = await LocationUtils.getFormattedLocation();
-  //             if (loc != null) {
-  //               final parts = loc.split(',');
-  //               if (parts.length == 2) {
-  //                 final lat = double.tryParse(parts[0].trim());
-  //                 final lng = double.tryParse(parts[1].trim());
-
-  //                 if (lat != null && lng != null) {
-  //                   final placeName = await LocationUtils.getReadableLocation(
-  //                     lat,
-  //                     lng,
-  //                   );
-
-  //                   setState(() {
-  //                     locationController.text =
-  //                         (placeName != null && placeName.isNotEmpty)
-  //                             ? placeName
-  //                             : 'Unknown location';
-  //                   });
-  //                   return;
-  //                 }
-  //               }
-  //             }
-
-  //             setState(() {
-  //               locationController.text = 'Unknown location';
-  //             });
-  //           },
-  //         ),
-  //         ListTile(
-  //           leading: const Icon(Icons.edit_location_alt),
-  //           title: const Text('Type manually'),
-  //           onTap: () => Navigator.pop(context),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MarketplaceBloc, MarketplaceState>(
       listener: (context, state) {
         if (state is AddProductSuccess) {
           setState(() => _isSubmitting = false);
-          // Navigator.popUntil(context, ModalRoute.withName('/marketplace'));
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/marketplace',
