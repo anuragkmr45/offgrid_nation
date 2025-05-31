@@ -320,7 +320,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
       }
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
-
+      
       final queryParams = {
         'q': Uri.encodeComponent(query),
         'page': page.toString(),
