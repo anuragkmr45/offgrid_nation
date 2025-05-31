@@ -136,29 +136,26 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     }
   }
 
-  Future<void> _onUpdateProfilePhoto(
-    UpdateProfilePhotoRequest event,
-    Emitter<UserProfileState> emit,
-  ) async {
-    emit(state.copyWith(status: UserProfileStatus.loading));
-    try {
-      final data = await updateProfilePhotoUsecase(event.file);
-      emit(
-        state.copyWith(
-          status: UserProfileStatus.success,
-          profilePictureUrl: data,
-          profileData: {...state.profileData ?? {}, 'profilePicture': data},
-        ),
-      );
-    } catch (error) {
-      emit(
-        state.copyWith(
-          status: UserProfileStatus.failure,
-          errorMessage: ErrorHandler.handle(error),
-        ),
-      );
-    }
+Future<void> _onUpdateProfilePhoto(
+  UpdateProfilePhotoRequest event,
+  Emitter<UserProfileState> emit,
+) async {
+  emit(state.copyWith(status: UserProfileStatus.photoUploading));
+  try {
+    final url = await updateProfilePhotoUsecase(event.file);
+    emit(state.copyWith(
+      status: UserProfileStatus.photoUpdated,
+      profilePictureUrl: url,
+      profileData: {...?state.profileData, 'profilePicture': url},
+    ));
+    add(const FetchProfileRequested(limit: 12)); // Auto-refresh profile
+  } catch (error) {
+    emit(state.copyWith(
+      status: UserProfileStatus.failure,
+      errorMessage: ErrorHandler.handle(error),
+    ));
   }
+}
 
   Future<void> _onFetchFollowersRequest(
     FetchFollowersRequest event,
@@ -274,38 +271,51 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
       );
     }
   }
+  
+Future<void> _onFetchPostsByUsername(
+  FetchPostsByUsername event,
+  Emitter<UserProfileState> emit,
+) async {
+  final isInitialFetch = event.cursor == null;
 
-  // Future<void> _onUpdateToggleBlockUnblockReques(
-  //   UpdateToggleBlockUnblockRequest event,
-  //   Emitter<UserProfileState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: UserProfileStatus.loading));
-  //   try {
-  //     final data = await updateToggleBlockUnblockUsecase(event.userId);
-  //     emit(
-  //       state.copyWith(
-  //         status: UserProfileStatus.success,
-  //         toggleBlockUnblockData: data,
-  //       ),
-  //     );
-  //   } catch (error) {
-  //     emit(
-  //       state.copyWith(
-  //         status: UserProfileStatus.failure,
-  //         errorMessage: ErrorHandler.handle(error),
-  //       ),
-  //     );
-  //   }
-  // }
-  Future<void> _onFetchPostsByUsername(
-    FetchPostsByUsername event,
-    Emitter<UserProfileState> emit,
-  ) async {
-    try {
-      final data = await fetchPostsByUsernameUsecase(event.username);
-      emit(state.copyWith(userPosts: data['posts'] ?? []));
-    } catch (error) {
-      emit(state.copyWith(errorMessage: ErrorHandler.handle(error)));
-    }
+  if (isInitialFetch) {
+    emit(state.copyWith(status: UserProfileStatus.loading));
+  } else {
+    emit(state.copyWith(isPaginating: true));
   }
+
+  try {
+    final result = await fetchPostsByUsernameUsecase(
+      event.username,
+      limit: event.limit,
+      cursor: event.cursor,
+    );
+
+    final List<dynamic> newPosts = result['posts'] ?? [];
+    final String? newCursor = result['nextCursor'];
+
+    final List<dynamic> combinedPosts = isInitialFetch
+        ? newPosts
+        : [...?state.userPosts, ...newPosts];
+
+    emit(
+      state.copyWith(
+        status: UserProfileStatus.loaded,
+        userPosts: combinedPosts,
+        userPostsCursor: newCursor,
+        isPaginating: false,
+        hasMorePosts: newCursor != null,
+      ),
+    );
+  } catch (error) {
+    emit(
+      state.copyWith(
+        status: UserProfileStatus.failure,
+        errorMessage: ErrorHandler.handle(error),
+        isPaginating: false,
+      ),
+    );
+  }
+}
+
 }

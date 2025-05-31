@@ -16,5 +16,5 @@ abstract class UserProfileRepository {
   Future<Map<String, dynamic>> updateToggleFollowUnfollow(String userId);
   Future<Map<String, dynamic>> updateToggleBlockUnblock(String userId);
   Future<Map<String, dynamic>> updateAcceptFollowRequest(String userId);
-  Future<Map<String, dynamic>> getPostsByUsername(String username);
+  Future<Map<String, dynamic>> getPostsByUsername(String username, {int limit, String? cursor});
 }

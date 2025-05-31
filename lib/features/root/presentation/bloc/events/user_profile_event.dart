@@ -10,10 +10,16 @@ sealed class UserProfileEvent extends Equatable {
 
 class FetchProfileRequested extends UserProfileEvent {
   final String? username;
-  const FetchProfileRequested({this.username});
+  final int limit;
+  final String? cursor;
+  const FetchProfileRequested({
+    this.username,
+    required this.limit,
+    this.cursor,
+  });
 
   @override
-  List<Object?> get props => [username];
+  List<Object?> get props => [username, limit, cursor];
 }
 
 class FetchUserProfileById extends UserProfileEvent {
@@ -104,8 +110,15 @@ class UpdateAcceptFollowRequest extends UserProfileEvent {
 
 class FetchPostsByUsername extends UserProfileEvent {
   final String username;
-  const FetchPostsByUsername(this.username);
+  final int limit;
+  final String? cursor;
+
+  const FetchPostsByUsername({
+    required this.username,
+    this.limit = 20,
+    this.cursor,
+  });
 
   @override
-  List<Object?> get props => [username];
+  List<Object?> get props => [username, limit, cursor];
 }
