@@ -110,6 +110,7 @@ enum UserProfileStatus {
   loading,
   loaded,
   updated,
+  photoUploading,
   photoUpdated,
   failure,
   success,

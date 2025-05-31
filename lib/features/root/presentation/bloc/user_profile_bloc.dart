@@ -136,29 +136,26 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
     }
   }
 
-  Future<void> _onUpdateProfilePhoto(
-    UpdateProfilePhotoRequest event,
-    Emitter<UserProfileState> emit,
-  ) async {
-    emit(state.copyWith(status: UserProfileStatus.loading));
-    try {
-      final data = await updateProfilePhotoUsecase(event.file);
-      emit(
-        state.copyWith(
-          status: UserProfileStatus.success,
-          profilePictureUrl: data,
-          profileData: {...state.profileData ?? {}, 'profilePicture': data},
-        ),
-      );
-    } catch (error) {
-      emit(
-        state.copyWith(
-          status: UserProfileStatus.failure,
-          errorMessage: ErrorHandler.handle(error),
-        ),
-      );
-    }
+Future<void> _onUpdateProfilePhoto(
+  UpdateProfilePhotoRequest event,
+  Emitter<UserProfileState> emit,
+) async {
+  emit(state.copyWith(status: UserProfileStatus.photoUploading));
+  try {
+    final url = await updateProfilePhotoUsecase(event.file);
+    emit(state.copyWith(
+      status: UserProfileStatus.photoUpdated,
+      profilePictureUrl: url,
+      profileData: {...?state.profileData, 'profilePicture': url},
+    ));
+    add(const FetchProfileRequested(limit: 12)); // Auto-refresh profile
+  } catch (error) {
+    emit(state.copyWith(
+      status: UserProfileStatus.failure,
+      errorMessage: ErrorHandler.handle(error),
+    ));
   }
+}
 
   Future<void> _onFetchFollowersRequest(
     FetchFollowersRequest event,
