@@ -25,43 +25,43 @@ class CategoryButton extends StatelessWidget {
     return BlocListener<MarketplaceBloc, MarketplaceState>(
       listener: (context, state) {
         if (state is CategoriesLoaded) {
-          Navigator.pop(context); // Close loading dialog
-          Future.microtask(() {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder:
-                  (_) => CategorySelectionModal(
-                    categories: state.categories,
-                    onCategorySelected: (categoryId) async {
-                      final screenState =
-                          context
-                              .findAncestorStateOfType<
-                                MarketplaceScreenState
-                              >();
-                      if (screenState != null) {
-                        // Show loading while fetching new results
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder:
-                              (_) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                        );
+            Navigator.pop(context); // Close loading dialog
+            Future.microtask(() {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder:
+                    (_) => CategorySelectionModal(
+                      categories: state.categories,
+                      onCategorySelected: (categoryId) async {
+                        final screenState =
+                            context
+                                .findAncestorStateOfType<
+                                  MarketplaceScreenState
+                                >();
+                        if (screenState != null) {
+                          // Show loading while fetching new results
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder:
+                                (_) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                          );
 
-                        await screenState.setCategoryAndFetch(categoryId);
+                          await screenState.setCategoryAndFetch(categoryId);
 
-                        if (context.mounted)
-                          Navigator.pop(context); // Close loading dialog
-                        if (context.mounted)
-                          Navigator.pop(context); // Close category modal
-                      }
-                    },
-                  ),
-            );
-          });
+                          if (context.mounted)
+                            Navigator.pop(context); // Close loading dialog
+                          if (context.mounted)
+                            Navigator.pop(context); // Close category modal
+                        }
+                      },
+                    ),
+              );
+            });
         } else if (state is MarketplaceFailure) {
           Navigator.pop(context); // Close loading dialog
           ScaffoldMessenger.of(context).showSnackBar(

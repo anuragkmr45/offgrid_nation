@@ -35,7 +35,7 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
       getCategoriesUseCase: sl(),
       getProductDetailsUseCase: sl(),
       myProductListUseCase: sl(),
-      deleteProductUseCase: sl(), 
+      deleteProductUseCase: sl(),
       searchProductsUseCase: sl(),
     );
     WidgetsBinding.instance.addPostFrameCallback(
@@ -88,7 +88,9 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
     super.dispose();
   }
 
-  Future<void> setCategoryAndFetch(String categoryId) async {
+  Future<void> setCategoryAndFetch(String? categoryId) async {
+    if (categoryId == null || categoryId.isEmpty) return;
+
     _selectedCategoryId = categoryId;
     await _fetchProductsWithLocation();
   }
