@@ -42,7 +42,7 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
       throw const NetworkException('Not authorized');
     }
 
-    final safeLimit = limit > 5 ? 5 : limit; // Enforce max limit
+    final safeLimit = limit > 5 ? 5 : limit;
     final query = {
       'limit': safeLimit.toString(),
       if (cursor != null) 'cursor': cursor,
@@ -53,7 +53,7 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
       headers: {'Authorization': 'Bearer $token'},
       queryParams: query,
     );
-print("-------------------------_$response");
+    
     if (response is! Map<String, dynamic>) {
       throw const NetworkException('Invalid feed response format');
     }

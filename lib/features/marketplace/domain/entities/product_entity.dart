@@ -28,6 +28,15 @@ class ProductEntity {
     required this.clicks,
     required this.createdAt,
   });
+  String extractOwnerId(dynamic ownerField) {
+  if (ownerField is String) return ownerField;
+  if (ownerField is Map<String, dynamic>) {
+    return ownerField['userId'] ?? ownerField['_id'] ?? '';
+  }
+  return '';
+}
+
+
   factory ProductEntity.fromJson(Map<String, dynamic> json) {
     final coords = json['location']?['coordinates'];
     double lat = 0.0;
@@ -51,7 +60,10 @@ class ProductEntity {
 
     return ProductEntity(
       id: json['_id'] ?? '',
-      ownerId: json['owner']?['userId'] ?? json['owner'] ?? '',
+      ownerId:
+          json['owner'] is Map
+              ? (json['owner']['userId'] ?? json['owner']['_id'] ?? '')
+              : json['owner'] ?? '',
       images: List<String>.from(json['images'] ?? []),
       title: json['title'] ?? '',
       price: json['price'].toString(),

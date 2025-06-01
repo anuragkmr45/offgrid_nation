@@ -70,7 +70,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
     try {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
-
+      
       if (title.length > 200) {
         throw const NetworkException('Title must be 200 characters or fewer.');
       }
@@ -181,6 +181,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
     try {
       final token = await authSession.getSessionToken();
       if (token == null) throw const NetworkException('Unauthorized');
+      
       final queryParams = {
         'latitude': latitude.toString(),
         'longitude': longitude.toString(),
@@ -195,7 +196,7 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
         headers: {'Authorization': 'Bearer $token'},
         queryParams: queryParams,
       );
-
+      
       if (response == null || response is! List) {
         throw const NetworkException('Invalid list products response');
       }
@@ -336,7 +337,6 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
         headers: {'Authorization': 'Bearer $token'},
         queryParams: queryParams,
       );
-      
       if (response is! List) {
         throw const NetworkException('Invalid search products response');
       }

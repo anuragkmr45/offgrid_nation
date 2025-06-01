@@ -9,6 +9,7 @@ class CustomInputField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final String? prefixText; // ✅ Added
 
   const CustomInputField({
     super.key,
@@ -17,12 +18,12 @@ class CustomInputField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.prefixText, // ✅ Added
   });
 
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      // Wrap CupertinoTextField in a FormField for validation
       return FormField<String>(
         initialValue: controller.text,
         validator: validator,
@@ -35,18 +36,27 @@ class CustomInputField extends StatelessWidget {
                 placeholder: placeholder,
                 obscureText: obscureText,
                 keyboardType: keyboardType,
+                prefix: prefixText != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          prefixText!,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    : null,
                 padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD9D9D9),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color:
-                        field.hasError ? AppColors.accent : Colors.transparent,
+                    color: field.hasError ? AppColors.accent : Colors.transparent,
                   ),
                 ),
-                onChanged: (value) {
-                  field.didChange(value);
-                },
+                onChanged: field.didChange,
               ),
               if (field.hasError)
                 Padding(
@@ -64,13 +74,13 @@ class CustomInputField extends StatelessWidget {
         },
       );
     } else {
-      // Use TextFormField for Android
       return TextFormField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         validator: validator,
         decoration: InputDecoration(
+          prefixText: prefixText, // ✅ Android version
           hintText: placeholder,
           filled: true,
           fillColor: const Color(0xFFD9D9D9),

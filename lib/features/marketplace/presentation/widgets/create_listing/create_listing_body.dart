@@ -12,6 +12,7 @@ import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/market
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/state/marketplace_state.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/event/marketplace_event.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/widgets/media_picker_component.dart';
+import 'package:offgrid_nation_app/core/utils/form_validation/marketplace_add_product_validation.dart';
 
 class CreateListingBody extends StatefulWidget {
   final List<File> selectedImages;
@@ -145,41 +146,27 @@ class _CreateListingBodyState extends State<CreateListingBody> {
   }
 
   void _handlePublish() {
-    // Validate form fields
     final form = _formKey.currentState;
-    if (form == null || !form.validate()) {
-      _showError('Please fill in all required fields.');
+    if (form == null || !form.validate()) return;
+
+    final canSubmit = MarketplaceAddProductValidation.canSubmit(
+      title: titleController.text,
+      price: priceController.text,
+      description: descController.text,
+      location: locationController.text,
+      hasImages: widget.selectedImages.isNotEmpty,
+      hasCategory: _selectedCategoryId != null,
+      hasCondition: _selectedCondition != null,
+      hasLatLng: _latitude != null && _longitude != null,
+    );
+
+    if (!canSubmit) {
+      _showError('Please complete all required fields properly.');
       return;
     }
 
-    // Image validation
-    if (widget.selectedImages.isEmpty) {
-      _showError('Please select at least 1 image.');
-      return;
-    }
-
-    // Condition validation
-    if (_selectedCondition == null) {
-      _showError('Please select a product condition.');
-      return;
-    }
-
-    // Category validation
-    if (_selectedCategoryId == null) {
-      _showError('Please select a product category.');
-      return;
-    }
-
-    // Location validation
-    if (_latitude == null || _longitude == null) {
-      _showError('Please select a valid location.');
-      return;
-    }
-
-    // Start submitting and disable button
     setState(() => _isSubmitting = true);
 
-    // Dispatch Bloc event with correct lat/lng
     context.read<MarketplaceBloc>().add(
       AddProductRequested(
         pictures: widget.selectedImages,
@@ -328,6 +315,17 @@ class _CreateListingBodyState extends State<CreateListingBody> {
       },
 
       builder: (context, state) {
+        // final isFormValid = MarketplaceAddProductValidation.canSubmit(
+        //   title: titleController.text,
+        //   price: priceController.text,
+        //   description: descController.text,
+        //   location: locationController.text,
+        //   hasImages: widget.selectedImages.isNotEmpty,
+        //   hasCategory: _selectedCategoryId != null,
+        //   hasCondition: _selectedCondition != null,
+        //   hasLatLng: _latitude != null && _longitude != null,
+        // );
+
         return Form(
           key: _formKey,
           child: ListView(
@@ -338,24 +336,17 @@ class _CreateListingBodyState extends State<CreateListingBody> {
               CustomInputField(
                 controller: titleController,
                 placeholder: 'Enter Title',
-                validator:
-                    (val) =>
-                        val == null || val.trim().isEmpty
-                            ? 'Title is required'
-                            : null,
+                validator: MarketplaceAddProductValidation.validateTitle,
               ),
               const SizedBox(height: 12),
-
               CustomInputField(
                 controller: priceController,
                 placeholder: 'Price',
                 keyboardType: TextInputType.number,
-                validator:
-                    (val) =>
-                        val == null || val.trim().isEmpty
-                            ? 'Price is required'
-                            : null,
+                prefixText: '\$',
+                validator: MarketplaceAddProductValidation.validatePrice,
               ),
+
               const SizedBox(height: 20),
 
               const Text(
@@ -428,11 +419,7 @@ class _CreateListingBodyState extends State<CreateListingBody> {
                 controller: descController,
                 placeholder: 'Description.....',
                 keyboardType: TextInputType.multiline,
-                validator:
-                    (val) =>
-                        val == null || val.trim().isEmpty
-                            ? 'Description is required'
-                            : null,
+                validator: MarketplaceAddProductValidation.validateDescription,
               ),
               const SizedBox(height: 12),
 
@@ -442,11 +429,7 @@ class _CreateListingBodyState extends State<CreateListingBody> {
                   child: CustomInputField(
                     controller: locationController,
                     placeholder: 'Location',
-                    validator:
-                        (val) =>
-                            val == null || val.trim().isEmpty
-                                ? 'Location is required'
-                                : null,
+                    validator: MarketplaceAddProductValidation.validateLocation,
                   ),
                 ),
               ),

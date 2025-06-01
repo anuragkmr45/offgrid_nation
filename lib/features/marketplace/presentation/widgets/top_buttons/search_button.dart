@@ -24,7 +24,11 @@ class _SearchButtonState extends State<SearchButton>
   final Debouncer _debouncer = Debouncer(milliseconds: 500);
 
   Future<void> _triggerSearch(String query) async {
-    if (query.trim().isEmpty) return;
+    if (query.trim().isEmpty) {
+      context.read<MarketplaceBloc>().add(SearchProductsRequested(query: ''));
+      return;
+    }
+
     final loc = await LocationUtils.getFormattedLocation();
     if (loc != null) {
       final parts = loc.split(',');
@@ -32,11 +36,7 @@ class _SearchButtonState extends State<SearchButton>
       final lng = double.tryParse(parts[1]);
       if (lat != null && lng != null) {
         context.read<MarketplaceBloc>().add(
-          SearchProductsRequested(
-            query: query.trim(),
-            lat: lat,
-            lng: lng,
-          ),
+          SearchProductsRequested(query: query.trim(), lat: lat, lng: lng),
         );
       }
     }
@@ -71,26 +71,26 @@ class _SearchButtonState extends State<SearchButton>
 
     return Platform.isIOS
         ? CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(8),
-            onPressed: () => setState(() => _isSearching = true),
-            child: content,
-          )
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(8),
+          onPressed: () => setState(() => _isSearching = true),
+          child: content,
+        )
         : ElevatedButton(
-            onPressed: () => setState(() => _isSearching = true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              side: BorderSide(color: AppColors.background),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+          onPressed: () => setState(() => _isSearching = true),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            side: BorderSide(color: AppColors.background),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: content,
-          );
+          ),
+          child: content,
+        );
   }
 
   Widget _buildSearchBar() {
@@ -113,6 +113,9 @@ class _SearchButtonState extends State<SearchButton>
           ),
           onPressed: () {
             _controller.clear();
+            context.read<MarketplaceBloc>().add(
+              SearchProductsRequested(query: ''),
+            );
             setState(() => _isSearching = false);
           },
         ),

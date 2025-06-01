@@ -22,6 +22,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
   final MyProductListUseCase myProductListUseCase;
   final DeleteProductUseCase deleteProductUseCase;
   final SearchProductsUseCase searchProductsUseCase;
+  List<ProductEntity> _cachedFeed = [];
 
   MarketplaceBloc({
     required this.addProductUseCase,
@@ -44,46 +45,50 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     // on<FetchMyProductsRequested>(_onAddRatingRequested);
     // on<FetchMyProductsRequested>(_onFetchRatingsRequested);
   }
-Future<void> _onAddProductRequested(
-  AddProductRequested event,
-  Emitter<MarketplaceState> emit,
-) async {
-  emit(MarketplaceLoading());
-  try {
-    final product = await addProductUseCase(
-      pictures: event.pictures,
-      title: event.title,
-      price: event.price,
-      condition: event.condition,
-      description: event.description,
-      category: event.category,
-      lat: event.lat,
-      lng: event.lng,
-    );
-    emit(AddProductSuccess(product));
-  } catch (e, st) {
-    print('❌ Product parsing failed. Bypassing and navigating anyway...');
-    print(e);
-    print(st);
+  Future<void> _onAddProductRequested(
+    AddProductRequested event,
+    Emitter<MarketplaceState> emit,
+  ) async {
+    emit(MarketplaceLoading());
+    try {
+      final product = await addProductUseCase(
+        pictures: event.pictures,
+        title: event.title,
+        price: event.price,
+        condition: event.condition,
+        description: event.description,
+        category: event.category,
+        lat: event.lat,
+        lng: event.lng,
+      );
+      emit(AddProductSuccess(product));
+    } catch (e, st) {
+      print('❌ Product parsing failed. Bypassing and navigating anyway...');
+      print(e);
+      print(st);
 
-    // 🔁 Bypass logic: Navigate anyway with dummy product
-    emit(AddProductSuccess(ProductEntity(
-      id: '',
-      ownerId: '',
-      images: [],
-      title: 'Unknown',
-      price: '0',
-      condition: 'Unknown',
-      description: 'Unknown',
-      category: '',
-      latitude: 0.0,
-      longitude: 0.0,
-      ratings: {},
-      clicks: 0,
-      createdAt: DateTime.now(),
-    )));
+      // 🔁 Bypass logic: Navigate anyway with dummy product
+      emit(
+        AddProductSuccess(
+          ProductEntity(
+            id: '',
+            ownerId: '',
+            images: [],
+            title: 'Unknown',
+            price: '0',
+            condition: 'Unknown',
+            description: 'Unknown',
+            category: '',
+            latitude: 0.0,
+            longitude: 0.0,
+            ratings: {},
+            clicks: 0,
+            createdAt: DateTime.now(),
+          ),
+        ),
+      );
+    }
   }
-}
 
   Future<void> _onFetchProductDetailsRequested(
     FetchProductDetailsRequested event,
@@ -112,6 +117,9 @@ Future<void> _onAddProductRequested(
         sortBy: event.sortBy,
         categoryId: event.categoryId,
       );
+
+      _cachedFeed = result;
+
       emit(
         ProductsLoaded(
           products: result,
@@ -166,10 +174,18 @@ Future<void> _onAddProductRequested(
     SearchProductsRequested event,
     Emitter<MarketplaceState> emit,
   ) async {
+    final query = event.query.trim();
+
+    if (query.isEmpty) {
+      emit(ProductsLoaded(products: _cachedFeed));
+      return;
+    }
+
     emit(MarketplaceLoading());
+
     try {
       final results = await searchProductsUseCase(
-        query: event.query,
+        query: query,
         category: event.category,
         sort: event.sort,
         lat: event.lat,
@@ -177,9 +193,10 @@ Future<void> _onAddProductRequested(
         page: event.page,
         limit: event.limit,
       );
+
       emit(SearchProductsLoaded(results: results));
     } catch (e) {
-      emit(MarketplaceFailure(e.toString()));
+      emit(MarketplaceFailure('Search products failed: ${e.toString()}'));
     }
   }
 }
