@@ -7,7 +7,7 @@ import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
 import '../../widget/profile/user-profile/user_profile_header.dart';
 import '../../widget/profile/user-profile/user_followers_tab.dart';
-import '../../widget/profile/user-profile/user_posts_tab.dart';
+import '../../widget/profile/profile/shared/posts_tab.dart';
 import '../../widget/profile/user-profile/user_following_tab.dart';
 
 class UserProfileScreen extends StatefulWidget {
