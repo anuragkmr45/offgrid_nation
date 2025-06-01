@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/wrapper/main_wrapper.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/search_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/home_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/search/search_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/add_post_screen.dart';
-import 'package:offgrid_nation_app/features/root/presentation/screens/messages_screen.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/screens/messages_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/premium_screen.dart';
 import 'package:offgrid_nation_app/injection_container.dart';
 
@@ -34,7 +35,11 @@ class _RootScreenState extends State<RootScreen> {
       child: const SearchScreen(),
     ),
     const AddPostScreen(),
-    const MessagesScreen(),
+    BlocProvider<ChatBloc>(
+      create: (_) => sl<ChatBloc>(),
+      child: const MessagesScreen(),
+    ),
+
     const PremiumScreen(),
   ];
 

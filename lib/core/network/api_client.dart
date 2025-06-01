@@ -151,4 +151,30 @@ class ApiClient {
       }
     }
   }
+
+  // ------------------ MULTIPART ------------------
+  Future<Map<String, dynamic>> uploadMultipartFile(
+    String endpoint, {
+    required String fileField,
+    required String filePath,
+    Map<String, String>? headers,
+  }) async {
+    final uri = Uri.parse(baseUrl).resolve(endpoint);
+
+    final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(_buildHeaders(headers));
+
+    final file = await http.MultipartFile.fromPath(fileField, filePath);
+    request.files.add(file);
+
+    final streamedResponse = await _client.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    final processed = processResponse(response);
+    if (processed is! Map<String, dynamic>) {
+      throw const NetworkException('Invalid upload response format');
+    }
+
+    return processed;
+  }
 }

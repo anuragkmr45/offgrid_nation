@@ -21,6 +21,18 @@ import 'package:offgrid_nation_app/features/auth/domain/usecases/send_otp_usecas
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/login_bloc.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/reset_password_bloc.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/signup_bloc.dart';
+import 'package:offgrid_nation_app/features/chat/data/datasource/chat_remote_datasource.dart';
+import 'package:offgrid_nation_app/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:offgrid_nation_app/features/chat/domain/repositories/chat_repository.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/delete_conversation_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_conversations_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/mark_conversation_read_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/mute_conversation_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/search_users_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/upload_media_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/data/datasources/marketplace_remote_datasource.dart';
 import 'package:offgrid_nation_app/features/marketplace/data/repositories/marketplace_repository_impl.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/repositories/marketplace_repository.dart';
@@ -349,4 +361,38 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
   sl.registerFactory(
     () =>  NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
   );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 💬 Chat Module
+  // ─────────────────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(
+      apiClient: sl(),
+      authSession: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => SendMessageUsecase(sl()));
+  sl.registerLazySingleton(() => GetMessagesUsecase(sl()));
+  sl.registerLazySingleton(() => UploadMediaUsecase(sl()));
+  sl.registerLazySingleton(() => GetConversationsUsecase(sl()));
+  sl.registerLazySingleton(() => MarkConversationReadUsecase(sl()));
+  sl.registerLazySingleton(() => MuteConversationUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteConversationUsecase(sl()));
+  sl.registerLazySingleton(() => SearchUsersUsecase(sl()));
+
+  sl.registerFactory(() => ChatBloc(
+        sendMessageUsecase: sl(),
+        getMessagesUsecase: sl(),
+        uploadMediaUsecase: sl(),
+        getConversationsUsecase: sl(),
+        markReadUsecase: sl(),
+        muteUsecase: sl(),
+        deleteUsecase: sl(),
+        searchUsersUsecase: sl(),
+      ));
 }

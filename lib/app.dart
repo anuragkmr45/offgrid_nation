@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/reset_password_bloc.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/marketplace_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/screens/product_details_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
@@ -23,7 +24,7 @@ import 'package:offgrid_nation_app/features/splash/presentation/screens/splash_s
 import 'package:offgrid_nation_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/screens/signup_scrceen.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/screens/reset_password_screen.dart';
-import 'package:offgrid_nation_app/features/root/presentation/widget/chat/conversation_screen.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/widget/chat/conversation_screen.dart';
 import 'package:offgrid_nation_app/features/marketplace/presentation/screens/marketplace_screen.dart';
 import 'package:offgrid_nation_app/core/widgets/wrapper/root_screen.dart';
 
@@ -65,7 +66,20 @@ class App extends StatelessWidget {
                 child: const ResetPasswordScreen(),
               ),
           '/home': (context) => const RootScreen(),
-          '/conversation': (context) => const ConversationScreen(),
+          '/conversation': (context) {
+            final args =
+                ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+            return BlocProvider<ChatBloc>(
+              create: (_) => di.sl<ChatBloc>(),
+              child: ConversationScreen(
+                conversationId: args['conversationId'],
+                recipientId: args['recipientId'],
+                recipientName: args['recipientName'],
+                status: args['status'] ?? 'Active now',
+              ),
+            );
+          },
           '/marketplace': (context) => const MarketplaceScreen(),
           '/marketplace/create-listing':
               (context) => BlocProvider<MarketplaceBloc>(
@@ -125,7 +139,20 @@ class App extends StatelessWidget {
                 child: const ResetPasswordScreen(),
               ),
           '/home': (context) => const RootScreen(),
-          '/conversation': (context) => const ConversationScreen(),
+          '/conversation': (context) {
+            final args =
+                ModalRoute.of(context)!.settings.arguments
+                    as Map<String, dynamic>;
+            return BlocProvider<ChatBloc>(
+              create: (_) => di.sl<ChatBloc>(),
+              child: ConversationScreen(
+                conversationId: args['conversationId'],
+                recipientId: args['recipientId'],
+                recipientName: args['recipientName'],
+                status: args['status'] ?? 'Active now',
+              ),
+            );
+          },
           '/marketplace': (context) => const MarketplaceScreen(),
           '/marketplace/create-listing':
               (context) => BlocProvider<MarketplaceBloc>(
