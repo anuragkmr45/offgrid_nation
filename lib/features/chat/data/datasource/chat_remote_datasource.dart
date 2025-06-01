@@ -63,14 +63,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<List<Map<String, dynamic>>> getMessages(String conversationId, {String? cursor}) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-print("--------------------------------");
+    
     final url = ChatApiConstants.getMessages(conversationId, cursor: cursor);
     final response = await apiClient.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
 
-print("-----------response--------------------- $response");
     if (response is! List) {
       throw const NetworkException('Failed to fetch messages');
     }
@@ -82,13 +81,12 @@ print("-----------response--------------------- $response");
   Future<List<Map<String, dynamic>>> getConversations() async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-print("--------------------------------calked");
+    
     final response = await apiClient.get(
       ChatApiConstants.getConversations,
       headers: {'Authorization': 'Bearer $token'},
     );
 
-print("-----------response--------------------- $response");
     if (response is! List) {
       throw const NetworkException('Invalid conversation list response');
     }
