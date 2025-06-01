@@ -1,5 +1,3 @@
-// File: lib/features/marketplace/presentation/widgets/product_details/product_details_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_details_entity.dart';
