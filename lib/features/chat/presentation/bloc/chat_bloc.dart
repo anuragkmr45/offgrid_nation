@@ -181,8 +181,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     emit(ChatLoading());
     try {
-      final list = await searchUsersUsecase(event.query);
-      emit(ConversationsLoaded(list));
+      final users = await searchUsersUsecase(event.query);
+      emit(SearchResultsLoaded(users));
     } catch (e) {
       emit(
         ChatError(

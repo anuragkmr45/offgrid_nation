@@ -2,16 +2,20 @@ import 'package:offgrid_nation_app/core/constants/chat_api_constants.dart';
 import 'package:offgrid_nation_app/core/network/api_client.dart';
 import 'package:offgrid_nation_app/core/session/auth_session.dart';
 import 'package:offgrid_nation_app/core/errors/network_exception.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/chat_user_entity.dart';
 
 abstract class ChatRemoteDataSource {
   Future<Map<String, dynamic>> sendMessage(Map<String, dynamic> body);
   Future<Map<String, dynamic>> uploadMedia(String endpoint, String filePath);
-  Future<List<Map<String, dynamic>>> getMessages(String conversationId, {String? cursor});
+  Future<List<Map<String, dynamic>>> getMessages(
+    String conversationId, {
+    String? cursor,
+  });
   Future<List<Map<String, dynamic>>> getConversations();
   Future<void> markConversationRead(String conversationId);
   Future<void> toggleMuteConversation(String conversationId, bool isMuted);
   Future<void> deleteConversation(String conversationId);
-  Future<List<Map<String, dynamic>>> searchUsers(String query);
+  Future<List<ChatUserEntity>> searchUsers(String query);
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -41,7 +45,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> uploadMedia(String endpoint, String filePath) async {
+  Future<Map<String, dynamic>> uploadMedia(
+    String endpoint,
+    String filePath,
+  ) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
 
@@ -60,10 +67,13 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getMessages(String conversationId, {String? cursor}) async {
+  Future<List<Map<String, dynamic>>> getMessages(
+    String conversationId, {
+    String? cursor,
+  }) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-    
+
     final url = ChatApiConstants.getMessages(conversationId, cursor: cursor);
     final response = await apiClient.get(
       url,
@@ -81,7 +91,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<List<Map<String, dynamic>>> getConversations() async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-    
+
     final response = await apiClient.get(
       ChatApiConstants.getConversations,
       headers: {'Authorization': 'Bearer $token'},
@@ -106,7 +116,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<void> toggleMuteConversation(String conversationId, bool isMuted) async {
+  Future<void> toggleMuteConversation(
+    String conversationId,
+    bool isMuted,
+  ) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
 
@@ -129,7 +142,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+  Future<List<ChatUserEntity>> searchUsers(String query) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
 
@@ -143,6 +156,6 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       throw const NetworkException('Invalid user search response');
     }
 
-    return response.cast<Map<String, dynamic>>();
+    return response.map((e) => ChatUserEntity.fromJson(e)).toList();
   }
 }

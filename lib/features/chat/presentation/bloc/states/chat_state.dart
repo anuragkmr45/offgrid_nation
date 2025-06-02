@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/chat_user_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/conversation_entity.dart';
 
@@ -54,3 +55,12 @@ class ChatError extends ChatState {
   @override
   List<Object?> get props => [message];
 }
+
+class SearchResultsLoaded extends ChatState {
+  final List<ChatUserEntity> users;
+  const SearchResultsLoaded(this.users);
+
+  @override
+  List<Object?> get props => [users];
+}
+

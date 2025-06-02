@@ -1,3 +1,4 @@
+import 'package:offgrid_nation_app/features/chat/domain/entities/chat_user_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/conversation_entity.dart';
 
@@ -19,5 +20,5 @@ abstract class ChatRepository {
 
   Future<void> deleteConversation(String conversationId);
 
-  Future<List<ConversationEntity>> searchUsers(String query);
+  Future<List<ChatUserEntity>> searchUsers(String query);
 }

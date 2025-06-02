@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/states/chat_state.dart';
@@ -28,14 +29,13 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
+  List<MessageEntity> _messages = [];
 
   @override
   void initState() {
     super.initState();
     context.read<ChatBloc>().add(GetMessagesRequested(widget.conversationId));
-    context.read<ChatBloc>().add(
-      MarkConversationReadRequested(widget.conversationId),
-    );
+    context.read<ChatBloc>().add(MarkConversationReadRequested(widget.conversationId));
   }
 
   void _handleSend(String message) {
@@ -63,38 +63,33 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final bodyContent = Column(
       children: [
         Expanded(
-          child: BlocBuilder<ChatBloc, ChatState>(
-            builder: (context, state) {
-              if (state is ChatLoading) {
-                return Center(
-                  child:
-                      isIOS
-                          ? const CupertinoActivityIndicator()
-                          : const CircularProgressIndicator(),
-                );
-              } else if (state is MessagesLoaded) {
-                final messages = state.messages;
-                return ListView.builder(
-                  reverse:
-                      false,
-                  controller: _scrollController,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final msg =
-                        messages[messages.length -
-                            1 -
-                            index];
-                    return ChatBubble(
-                      message: msg.text ?? '',
-                      time: _formatTime(msg.sentAt),
-                      isMe: msg.sender.id != widget.recipientId,
-                    );
-                  },
-                );
-              } else {
-                return const SizedBox();
+          child: BlocListener<ChatBloc, ChatState>(
+            listener: (context, state) {
+              if (state is MessagesLoaded) {
+                setState(() {
+                  _messages = state.messages;
+                });
+              } else if (state is SendMessageSuccess) {
+                setState(() {
+                  _messages.insert(0, state.response); // insert at top if reversed
+                });
               }
             },
+            child: _messages.isEmpty
+                ? const Center(child: Text("No messages"))
+                : ListView.builder(
+                    reverse: true, // Show newest at bottom
+                    controller: _scrollController,
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = _messages[index];
+                      return ChatBubble(
+                        message: msg.text ?? '',
+                        time: _formatTime(msg.sentAt),
+                        isMe: msg.sender.id != widget.recipientId,
+                      );
+                    },
+                  ),
           ),
         ),
         ChatInput(onSend: _handleSend),
@@ -103,23 +98,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     return isIOS
         ? CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(
-            leading: GestureDetector(
-              onTap: _handleBack,
-              child: const Icon(CupertinoIcons.back),
+            navigationBar: CupertinoNavigationBar(
+              leading: GestureDetector(
+                onTap: _handleBack,
+                child: const Icon(CupertinoIcons.back),
+              ),
+              middle: Text(widget.recipientName),
             ),
-            middle: Text(widget.recipientName),
-          ),
-          child: SafeArea(child: bodyContent),
-        )
+            child: SafeArea(child: bodyContent),
+          )
         : Scaffold(
-          appBar: ChatHeader(
-            userName: widget.recipientName,
-            status: widget.status,
-            onBack: _handleBack,
-          ),
-          body: SafeArea(child: bodyContent),
-        );
+            appBar: ChatHeader(
+              userName: widget.recipientName,
+              status: widget.status,
+              onBack: _handleBack,
+            ),
+            body: SafeArea(child: bodyContent),
+          );
   }
 
   String _formatTime(DateTime dateTime) {

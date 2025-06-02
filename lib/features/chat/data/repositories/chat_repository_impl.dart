@@ -1,4 +1,5 @@
 import 'package:offgrid_nation_app/features/chat/data/datasource/chat_remote_datasource.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/chat_user_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/conversation_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/repositories/chat_repository.dart';
@@ -47,9 +48,9 @@ class ChatRepositoryImpl implements ChatRepository {
     return remoteDataSource.deleteConversation(conversationId);
   }
 
-  @override
-  Future<List<ConversationEntity>> searchUsers(String query) async {
-    final result = await remoteDataSource.searchUsers(query);
-    return result.map((e) => ConversationEntity.fromJson(e)).toList();
-  }
+@override
+Future<List<ChatUserEntity>> searchUsers(String query) async {
+  return await remoteDataSource.searchUsers(query);
+}
+
 }
