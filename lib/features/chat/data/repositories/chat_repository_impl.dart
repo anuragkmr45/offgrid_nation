@@ -16,8 +16,28 @@ class ChatRepositoryImpl implements ChatRepository {
   }
 
   @override
-  Future<List<MessageEntity>> getMessages(String conversationId, {String? cursor}) async {
-    final result = await remoteDataSource.getMessages(conversationId, cursor: cursor);
+  Future<List<MessageEntity>> getMessages(
+    String conversationId, {
+    String? cursor,
+  }) async {
+    final result = await remoteDataSource.getMessages(
+      conversationId,
+      cursor: cursor,
+    );
+    return result.map((e) => MessageEntity.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<MessageEntity>> getMessagesByRecipient(
+    String recipientId, {
+    int? limit,
+    String? cursor
+  }) async {
+    final result = await remoteDataSource.getMessagesByRecipient(
+      recipientId,
+      limit: limit,
+      cursor: cursor,
+    );
     return result.map((e) => MessageEntity.fromJson(e)).toList();
   }
 
@@ -48,9 +68,8 @@ class ChatRepositoryImpl implements ChatRepository {
     return remoteDataSource.deleteConversation(conversationId);
   }
 
-@override
-Future<List<ChatUserEntity>> searchUsers(String query) async {
-  return await remoteDataSource.searchUsers(query);
-}
-
+  @override
+  Future<List<ChatUserEntity>> searchUsers(String query) async {
+    return await remoteDataSource.searchUsers(query);
+  }
 }

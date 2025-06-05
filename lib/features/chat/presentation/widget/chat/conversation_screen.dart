@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:offgrid_nation_app/core/session/auth_session.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
@@ -8,19 +9,24 @@ import 'package:offgrid_nation_app/features/chat/presentation/bloc/states/chat_s
 import 'package:offgrid_nation_app/features/chat/presentation/widget/chat/chat_bubble.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/widget/chat/chat_input.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/widget/chat/chat_header.dart';
+import 'package:offgrid_nation_app/injection_container.dart';
 
 class ConversationScreen extends StatefulWidget {
-  final String conversationId;
+  final String? conversationId;
   final String recipientId;
   final String recipientName;
+  final String recipientUsername;
+  final String profilePicture;
   final String status;
 
   const ConversationScreen({
     super.key,
-    required this.conversationId,
     required this.recipientId,
     required this.recipientName,
-    this.status = 'Active now',
+    required this.conversationId,
+    required this.recipientUsername,
+    required this.profilePicture,
+    this.status = '',
   });
 
   @override
@@ -30,12 +36,28 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   List<MessageEntity> _messages = [];
+  String? _myUserId;
+  int limit = 10;
 
   @override
   void initState() {
     super.initState();
-    context.read<ChatBloc>().add(GetMessagesRequested(widget.conversationId));
-    context.read<ChatBloc>().add(MarkConversationReadRequested(widget.conversationId));
+    _initChat();
+  }
+
+  Future<void> _initChat() async {
+    final userId = await sl<AuthSession>().getCurrentUserId();
+    if (userId == null) return;
+
+    setState(() => _myUserId = userId);
+    context.read<ChatBloc>().add(
+      GetMessagesByRecipientRequested(widget.recipientId, limit),
+    );
+    if (widget.conversationId != null) {
+      context.read<ChatBloc>().add(
+        MarkConversationReadRequested(widget.conversationId!),
+      );
+    }
   }
 
   void _handleSend(String message) {
@@ -43,7 +65,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
       'recipient': widget.recipientId,
       'actionType': 'text',
       'text': message,
-      'conversationId': widget.conversationId,
+      if (widget.conversationId != null)
+        'conversationId': widget.conversationId,
     };
     context.read<ChatBloc>().add(SendMessageRequested(body));
   }
@@ -69,27 +92,39 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 setState(() {
                   _messages = state.messages;
                 });
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (_scrollController.hasClients) {
+                    _scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOut,
+                    );
+                  }
+                });
               } else if (state is SendMessageSuccess) {
                 setState(() {
-                  _messages.insert(0, state.response); // insert at top if reversed
+                  _messages.add(state.response);
                 });
               }
             },
-            child: _messages.isEmpty
-                ? const Center(child: Text("No messages"))
-                : ListView.builder(
-                    reverse: true, // Show newest at bottom
-                    controller: _scrollController,
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = _messages[index];
-                      return ChatBubble(
-                        message: msg.text ?? '',
-                        time: _formatTime(msg.sentAt),
-                        isMe: msg.sender.id != widget.recipientId,
-                      );
-                    },
-                  ),
+            child:
+                _messages.isEmpty
+                    ? const Center(child: Text("No messages"))
+                    : ListView.builder(
+                      reverse: false,
+                      controller: _scrollController,
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final msg = _messages[index];
+                        final bool isMe =
+                            _myUserId != null && msg.sender.id == _myUserId;
+                        return ChatBubble(
+                          message: msg.text ?? '',
+                          time: _formatTime(msg.sentAt),
+                          isMe: isMe,
+                        );
+                      },
+                    ),
           ),
         ),
         ChatInput(onSend: _handleSend),
@@ -98,23 +133,25 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     return isIOS
         ? CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              leading: GestureDetector(
-                onTap: _handleBack,
-                child: const Icon(CupertinoIcons.back),
-              ),
-              middle: Text(widget.recipientName),
+          navigationBar: CupertinoNavigationBar(
+            leading: GestureDetector(
+              onTap: _handleBack,
+              child: const Icon(CupertinoIcons.back),
             ),
-            child: SafeArea(child: bodyContent),
-          )
+            middle: Text(widget.recipientName),
+          ),
+          child: SafeArea(child: bodyContent),
+        )
         : Scaffold(
-            appBar: ChatHeader(
-              userName: widget.recipientName,
-              status: widget.status,
-              onBack: _handleBack,
-            ),
-            body: SafeArea(child: bodyContent),
-          );
+          appBar: ChatHeader(
+            userName: widget.recipientUsername,
+            name: widget.recipientName,
+            profilePicture: widget.profilePicture,
+            status: widget.status,
+            onBack: _handleBack,
+          ),
+          body: SafeArea(child: bodyContent),
+        );
   }
 
   String _formatTime(DateTime dateTime) {

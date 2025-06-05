@@ -10,6 +10,12 @@ abstract class ChatRepository {
     String? cursor,
   });
 
+  Future<List<MessageEntity>> getMessagesByRecipient(
+    String conversationId, {
+    int? limit,
+    String? cursor
+  });
+
   Future<String> uploadMedia(String endpoint, String filePath);
 
   Future<List<ConversationEntity>> getConversations();

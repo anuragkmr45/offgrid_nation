@@ -16,6 +16,11 @@ abstract class ChatRemoteDataSource {
   Future<void> toggleMuteConversation(String conversationId, bool isMuted);
   Future<void> deleteConversation(String conversationId);
   Future<List<ChatUserEntity>> searchUsers(String query);
+  Future<List<Map<String, dynamic>>> getMessagesByRecipient(
+    String recipientId, {
+    int? limit,
+    String? cursor,
+  });
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -88,6 +93,27 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getMessagesByRecipient(
+    String recipientId, {
+    int? limit,
+    String? cursor
+  }) async {
+    final token = await authSession.getSessionToken();
+    if (token == null) throw const NetworkException('Unauthorized');
+
+    final response = await apiClient.get(
+      ChatApiConstants.getMessagesByRecipient(recipientId, limit = 10, cursor),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response is! List) {
+      throw const NetworkException('Invalid message list response');
+    }
+
+    return response.cast<Map<String, dynamic>>();
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> getConversations() async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
@@ -96,7 +122,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       ChatApiConstants.getConversations,
       headers: {'Authorization': 'Bearer $token'},
     );
-
+    
     if (response is! List) {
       throw const NetworkException('Invalid conversation list response');
     }
@@ -151,7 +177,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
-
+    
     if (response is! List) {
       throw const NetworkException('Invalid user search response');
     }

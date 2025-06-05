@@ -103,13 +103,13 @@ class _SearchUserBottomSheetState extends State<SearchUserBottomSheet> {
                                   'profilePicture': user.profilePicture,
                                 }),
                           ),
-                          onTap:
-                              () => widget.onUserSelected({
-                                '_id': user.id,
-                                'username': user.username,
-                                'fullName': user.fullName,
-                                'profilePicture': user.profilePicture,
-                              }),
+                          // onTap:
+                          //     () => widget.onUserSelected({
+                          //       '_id': user.id,
+                          //       'username': user.username,
+                          //       'fullName': user.fullName,
+                          //       'profilePicture': user.profilePicture,
+                          //     }),
                         );
                       },
                     );

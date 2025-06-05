@@ -19,24 +19,31 @@ class ConversationEntity extends Equatable {
     required this.unreadCount,
   });
 
-  factory ConversationEntity.fromJson(Map<String, dynamic> json) {
-    return ConversationEntity(
-      conversationId: json['conversationId'] as String,
-      user: ChatUserEntity.fromJson(json['user']),
-      lastMessage: MessageEntity.fromJson(json['lastMessage']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-      muted: json['muted'] ?? false,
-      unreadCount: json['unreadCount'] ?? 0,
-    );
-  }
+factory ConversationEntity.fromJson(Map<String, dynamic> json) {
+  return ConversationEntity(
+    conversationId: json['conversationId'] ?? '',
+    user: json['user'] != null
+        ? ChatUserEntity.fromJson(json['user'])
+        : ChatUserEntity.fallback(),
+    lastMessage: json['lastMessage'] != null
+        ? MessageEntity.fromJson(json['lastMessage'])
+        : MessageEntity.fallback(),
+    updatedAt: json['updatedAt'] != null
+        ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
+        : DateTime.now(),
+    muted: json['muted'] ?? false,
+    unreadCount: json['unreadCount'] ?? 0,
+  );
+}
+
 
   @override
   List<Object?> get props => [
-        conversationId,
-        user,
-        lastMessage,
-        updatedAt,
-        muted,
-        unreadCount,
-      ];
+    conversationId,
+    user,
+    lastMessage,
+    updatedAt,
+    muted,
+    unreadCount,
+  ];
 }

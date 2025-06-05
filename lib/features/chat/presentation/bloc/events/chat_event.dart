@@ -69,3 +69,13 @@ class SearchUsersRequested extends ChatEvent {
   @override
   List<Object?> get props => [query];
 }
+
+class GetMessagesByRecipientRequested extends ChatEvent {
+  final String recipientId;
+  final int? limit;
+  final String? cursor;
+  const GetMessagesByRecipientRequested(this.recipientId, [this.limit ,this.cursor]);
+
+  @override
+  List<Object?> get props => [recipientId, limit, cursor];
+}

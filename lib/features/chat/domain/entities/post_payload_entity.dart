@@ -30,7 +30,7 @@ class PostPayloadEntity extends Equatable {
 
   factory PostPayloadEntity.fromJson(Map<String, dynamic> json) {
     return PostPayloadEntity(
-      id: json['_id'],
+      id: json['_id'] ?? "",
       user: ChatUserEntity.fromJson(json['userId']),
       media: (json['media'] as List<dynamic>).cast<String>(),
       content: json['content'],

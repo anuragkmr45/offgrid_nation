@@ -74,9 +74,11 @@ class App extends StatelessWidget {
               create: (_) => di.sl<ChatBloc>(),
               child: ConversationScreen(
                 conversationId: args['conversationId'],
-                recipientId: args['recipientId'],
-                recipientName: args['recipientName'],
-                status: args['status'] ?? 'Active now',
+                recipientId: args['recipientId'] ?? "",
+                recipientName: args['recipientName'] ?? "",
+                recipientUsername: args['recipientUsername'] ?? "",
+                profilePicture: args['profilePicture'] ?? "",
+                status: args['status'] ?? '',
               ),
             );
           },
@@ -147,9 +149,11 @@ class App extends StatelessWidget {
               create: (_) => di.sl<ChatBloc>(),
               child: ConversationScreen(
                 conversationId: args['conversationId'],
-                recipientId: args['recipientId'],
-                recipientName: args['recipientName'],
-                status: args['status'] ?? 'Active now',
+                recipientId: args['recipientId'] ?? "",
+                recipientName: args['recipientName'] ?? "",
+                recipientUsername: args['recipientUsername'] ?? "",
+                profilePicture: args['profilePicture'] ?? "",
+                status: args['status'] ?? '',
               ),
             );
           },

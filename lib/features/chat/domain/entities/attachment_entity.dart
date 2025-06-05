@@ -11,10 +11,15 @@ class AttachmentEntity extends Equatable {
 
   factory AttachmentEntity.fromJson(Map<String, dynamic> json) {
     return AttachmentEntity(
-      type: json['type'] ?? '',
-      url: json['url'] ?? '',
+      type: json['type'] is String ? json['type'] : '',
+      url: json['url'] is String ? json['url'] : '',
     );
   }
+
+  factory AttachmentEntity.fallback() => const AttachmentEntity(
+        type: 'unknown',
+        url: '',
+      );
 
   @override
   List<Object?> get props => [type, url];

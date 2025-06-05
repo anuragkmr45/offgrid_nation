@@ -1,6 +1,7 @@
 // 📁 lib/features/chat/presentation/bloc/chat_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/errors/network_exception.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_by_recipient_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_usecase.dart';
@@ -21,6 +22,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final MuteConversationUsecase muteUsecase;
   final DeleteConversationUsecase deleteUsecase;
   final SearchUsersUsecase searchUsersUsecase;
+  final GetMessagesByRecipientUsecase getMessagesByRecipientUsecase;
 
   ChatBloc({
     required this.sendMessageUsecase,
@@ -31,6 +33,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.muteUsecase,
     required this.deleteUsecase,
     required this.searchUsersUsecase,
+    required this.getMessagesByRecipientUsecase,
   }) : super(ChatInitial()) {
     on<SendMessageRequested>(_onSendMessage);
     on<GetMessagesRequested>(_onGetMessages);
@@ -40,6 +43,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<ToggleMuteConversationRequested>(_onToggleMute);
     on<DeleteConversationRequested>(_onDeleteConversation);
     on<SearchUsersRequested>(_onSearchUsers);
+    on<GetMessagesByRecipientRequested>(_onGetMessagesByRecipient);
   }
 
   Future<void> _onSendMessage(
@@ -189,6 +193,25 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           e is NetworkException
               ? (e.message ?? 'Unexpected network error')
               : 'Search failed',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onGetMessagesByRecipient(
+    GetMessagesByRecipientRequested event,
+    Emitter<ChatState> emit,
+  ) async {
+    emit(ChatLoading());
+    try {
+      final messages = await getMessagesByRecipientUsecase(event.recipientId, event.limit, event.cursor);
+      emit(MessagesLoaded(messages));
+    } catch (e) {
+      emit(
+        ChatError(
+          e is NetworkException
+              ? (e.message ?? 'Unexpected error')
+              : 'Failed to load messages',
         ),
       );
     }

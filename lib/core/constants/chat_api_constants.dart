@@ -17,6 +17,8 @@ class ChatApiConstants {
       '/conversations/$conversationId/mute';
   static String deleteConversation(String conversationId) =>
       '/conversations/$conversationId';
+  static String getMessagesByRecipient(String recipientId, int? limit, String? cursor) =>
+      '/conversations/messages?recipient=$recipientId&limit=$limit&cursor=$cursor';
 
   // Messaging
   static const String sendMessage = '/messages';

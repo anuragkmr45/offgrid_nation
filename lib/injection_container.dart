@@ -26,6 +26,7 @@ import 'package:offgrid_nation_app/features/chat/data/repositories/chat_reposito
 import 'package:offgrid_nation_app/features/chat/domain/repositories/chat_repository.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/delete_conversation_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/get_conversations_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_by_recipient_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/mark_conversation_read_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/mute_conversation_usecase.dart';
@@ -384,6 +385,10 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
   sl.registerLazySingleton(() => MuteConversationUsecase(sl()));
   sl.registerLazySingleton(() => DeleteConversationUsecase(sl()));
   sl.registerLazySingleton(() => SearchUsersUsecase(sl()));
+  sl.registerLazySingleton<GetMessagesByRecipientUsecase>(
+    () => GetMessagesByRecipientUsecase(sl()),
+  );
+
 
   sl.registerFactory(() => ChatBloc(
         sendMessageUsecase: sl(),
@@ -393,6 +398,7 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
         markReadUsecase: sl(),
         muteUsecase: sl(),
         deleteUsecase: sl(),
-        searchUsersUsecase: sl(),
+        searchUsersUsecase: sl(), 
+        getMessagesByRecipientUsecase: sl(),
       ));
 }

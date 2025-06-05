@@ -37,18 +37,18 @@ class MessageEntity extends Equatable {
       sender: _parseUser(json['sender']),
       recipient: _parseUser(json['recipient']),
       text: json['text'],
-      attachments: _parseAttachments(json['attachments']),
+      attachments: parseAttachments(json['attachments']),
       sentAt: DateTime.parse(json['sentAt']),
-      deliveredAt: json['deliveredAt'] != null
-          ? DateTime.tryParse(json['deliveredAt'])
-          : null,
-      readAt: json['readAt'] != null
-          ? DateTime.tryParse(json['readAt'])
-          : null,
+      deliveredAt:
+          json['deliveredAt'] != null
+              ? DateTime.tryParse(json['deliveredAt'])
+              : null,
+      readAt: json['readAt'] != null ? DateTime.tryParse(json['readAt']) : null,
       actionType: json['actionType'] ?? 'text',
-      postPayload: json['postPayload'] != null
-          ? PostPayloadEntity.fromJson(json['postPayload'])
-          : null,
+      postPayload:
+          json['postPayload'] != null
+              ? PostPayloadEntity.fromJson(json['postPayload'])
+              : null,
     );
   }
 
@@ -61,6 +61,7 @@ class MessageEntity extends Equatable {
         username: '',
         fullName: '',
         profilePicture: '',
+        conversationId: '',
       );
     } else {
       return const ChatUserEntity(
@@ -68,11 +69,12 @@ class MessageEntity extends Equatable {
         username: '',
         fullName: '',
         profilePicture: '',
+        conversationId: '',
       );
     }
   }
 
-  static List<AttachmentEntity> _parseAttachments(dynamic raw) {
+  static List<AttachmentEntity> parseAttachments(dynamic raw) {
     if (raw is List) {
       return raw.map((e) {
         if (e is String) {
@@ -87,18 +89,36 @@ class MessageEntity extends Equatable {
     return [];
   }
 
+  factory MessageEntity.fallback() {
+    final placeholderUser = ChatUserEntity.fallback();
+
+    return MessageEntity(
+      id: '',
+      conversationId: '',
+      sender: placeholderUser,
+      recipient: placeholderUser,
+      text: '',
+      attachments: const [],
+      sentAt: DateTime.now(),
+      deliveredAt: null,
+      readAt: null,
+      actionType: 'text',
+      postPayload: null,
+    );
+  }
+
   @override
   List<Object?> get props => [
-        id,
-        conversationId,
-        sender,
-        recipient,
-        text,
-        attachments,
-        sentAt,
-        deliveredAt,
-        readAt,
-        actionType,
-        postPayload,
-      ];
+    id,
+    conversationId,
+    sender,
+    recipient,
+    text,
+    attachments,
+    sentAt,
+    deliveredAt,
+    readAt,
+    actionType,
+    postPayload,
+  ];
 }

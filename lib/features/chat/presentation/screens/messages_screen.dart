@@ -48,9 +48,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         context,
         '/conversation',
         arguments: {
-          'conversationId': null,
           'recipientId': selectedUser['_id'],
-          'recipientName': selectedUser['fullName'] ?? selectedUser['username'],
+          'recipientName': selectedUser['fullName'],
+          'conversationId': selectedUser['conversationId'],
+          'recipientUsername': selectedUser['username'],
+          'profilePicture': selectedUser['profilePicture'],
           'status': 'Start chat',
         },
       );
