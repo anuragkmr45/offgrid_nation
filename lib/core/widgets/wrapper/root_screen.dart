@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/wrapper/main_wrapper.dart';
+import 'package:offgrid_nation_app/features/chat/domain/utils/auto_fetch_wrapper.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/search_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/home_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/search/search_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/add_post_screen.dart';
-import 'package:offgrid_nation_app/features/root/presentation/screens/messages_screen.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/screens/messages_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/premium_screen.dart';
 import 'package:offgrid_nation_app/injection_container.dart';
 
@@ -34,15 +37,24 @@ class _RootScreenState extends State<RootScreen> {
       child: const SearchScreen(),
     ),
     const AddPostScreen(),
-    const MessagesScreen(),
+    BlocProvider<ChatBloc>(
+      create: (_) => sl<ChatBloc>(),
+      child: AutoFetchWrapper(child: const MessagesScreen()),
+    ),
+
     const PremiumScreen(),
   ];
 
   // Updates the current tab index when a navigation icon is tapped.
   void _onTabSelected(int index) {
-    setState(() {
-      _currentTabIndex = index;
-    });
+    if (_currentTabIndex == index && index == 3) {
+      // Tab already active AND it's the Chat tab (index 3)
+      sl<ChatBloc>().add(const GetConversationsRequested());
+    } else {
+      setState(() {
+        _currentTabIndex = index;
+      });
+    }
   }
 
   @override
