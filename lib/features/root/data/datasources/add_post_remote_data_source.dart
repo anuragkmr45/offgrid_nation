@@ -18,13 +18,11 @@ class AddPostRemoteDataSource {
     if (token == null) throw Exception("Unauthorized");
 
     final uri = Uri.parse('${ApiConstants.baseUrl}/post');
-    print("------------uri-------------- $uri");
+    
     final request =
         http.MultipartRequest('POST', uri)
           ..headers['Authorization'] = 'Bearer $token'
           ..fields['content'] = content;
-
-    print("-------------request------------ $request");
 
     if (location != null) {
       request.fields['location'] = location;
@@ -45,11 +43,9 @@ class AddPostRemoteDataSource {
     }
 
     final response = await request.send();
-    print("------------response-------------- $response");
+    
     final responseBody = await http.Response.fromStream(response);
-    print(
-      '---------jsonDecode(responseBody.body)-------- ${jsonDecode(responseBody.body)}',
-    );
+
     if (response.statusCode == 201) {
       return jsonDecode(responseBody.body);
     } else {
