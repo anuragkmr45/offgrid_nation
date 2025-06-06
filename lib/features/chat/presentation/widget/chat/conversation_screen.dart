@@ -37,12 +37,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final ScrollController _scrollController = ScrollController();
   List<MessageEntity> _messages = [];
   String? _myUserId;
-  int limit = 10;
+  int limit = 20;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  String? _cursor;
 
   @override
   void initState() {
     super.initState();
     _initChat();
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _initChat() async {
@@ -50,14 +54,41 @@ class _ConversationScreenState extends State<ConversationScreen> {
     if (userId == null) return;
 
     setState(() => _myUserId = userId);
-    context.read<ChatBloc>().add(
-      GetMessagesByRecipientRequested(widget.recipientId, limit),
-    );
+
+    _fetchInitialMessages();
+
     if (widget.conversationId != null) {
       context.read<ChatBloc>().add(
         MarkConversationReadRequested(widget.conversationId!),
       );
     }
+  }
+
+  void _fetchInitialMessages() {
+    context.read<ChatBloc>().add(
+      GetMessagesByRecipientRequested(widget.recipientId, limit),
+    );
+  }
+
+  void _fetchOlderMessages() {
+    if (_isLoadingMore || !_hasMore || _messages.isEmpty) return;
+
+    final oldestMsg = _messages.last;
+    final cursor = oldestMsg.sentAt.toIso8601String();
+
+    // Check: if this cursor was already used → prevent infinite loop
+    if (_cursor != null && _cursor == cursor) {
+      return; // Already fetched this cursor → stop
+    }
+
+    setState(() {
+      _isLoadingMore = true;
+      _cursor = cursor; // Store this cursor to detect loop
+    });
+
+    context.read<ChatBloc>().add(
+      GetMessagesByRecipientRequested(widget.recipientId, limit, cursor),
+    );
   }
 
   void _handleSend(String message) {
@@ -79,6 +110,27 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
   }
 
+  void _onScroll() {
+    if (_scrollController.position.atEdge) {
+      final isTop = _scrollController.position.pixels != 0;
+      if (isTop) {
+        _fetchOlderMessages();
+      }
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
@@ -86,45 +138,44 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final bodyContent = Column(
       children: [
         Expanded(
-          child: BlocListener<ChatBloc, ChatState>(
-            listener: (context, state) {
-              if (state is MessagesLoaded) {
-                setState(() {
-                  _messages = state.messages;
-                });
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_scrollController.hasClients) {
-                    _scrollController.animateTo(
-                      0,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                    );
-                  }
-                });
-              } else if (state is SendMessageSuccess) {
-                setState(() {
-                  _messages.add(state.response);
-                });
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (scrollNotification) {
+              if (scrollNotification is ScrollEndNotification &&
+                  _scrollController.position.pixels >=
+                      _scrollController.position.maxScrollExtent - 200 &&
+                  !_isLoadingMore &&
+                  _hasMore &&
+                  _messages.isNotEmpty) {
+                _fetchOlderMessages();
               }
+              return false;
             },
-            child:
-                _messages.isEmpty
-                    ? const Center(child: Text("No messages"))
-                    : ListView.builder(
-                      reverse: false,
-                      controller: _scrollController,
-                      itemCount: _messages.length,
-                      itemBuilder: (context, index) {
-                        final msg = _messages[index];
-                        final bool isMe =
-                            _myUserId != null && msg.sender.id == _myUserId;
-                        return ChatBubble(
-                          message: msg.text ?? '',
-                          time: _formatTime(msg.sentAt),
-                          isMe: isMe,
-                        );
-                      },
+            child: ListView.builder(
+              reverse: true,
+              controller: _scrollController,
+              physics:
+                  const AlwaysScrollableScrollPhysics(), // 🟢 THIS FIXES your UI stuck issue
+              itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (_isLoadingMore && index == _messages.length) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(),
                     ),
+                  );
+                }
+
+                final msg = _messages[index];
+                final bool isMe =
+                    _myUserId != null && msg.sender.id == _myUserId;
+                return ChatBubble(
+                  message: msg.text ?? '',
+                  time: _formatTime(msg.sentAt),
+                  isMe: isMe,
+                );
+              },
+            ),
           ),
         ),
         ChatInput(onSend: _handleSend),
@@ -162,5 +213,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
     if (diff.inHours < 24) return '${diff.inHours}h';
     if (diff.inDays < 7) return '${diff.inDays}d';
     return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
   }
 }

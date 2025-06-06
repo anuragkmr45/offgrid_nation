@@ -1,7 +1,8 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:offgrid_nation_app/core/constants/theme_constants.dart' show AppColors;
+import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
 
 class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   final String userName;
@@ -37,12 +38,22 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
         ),
         middle: GestureDetector(
           onTap: () => _navigateToUserProfile(context),
-          child: Column(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-              // Uncomment below if status needed
-              // Text(status, style: const TextStyle(fontSize: 12, color: AppColors.background)),
+              CircleAvatar(
+                radius: 16,
+                backgroundImage: CachedNetworkImageProvider(profilePicture),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(status, style: const TextStyle(fontSize: 12, color: AppColors.background)),
+                ],
+              ),
             ],
           ),
         ),
@@ -55,12 +66,20 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
         ),
         title: GestureDetector(
           onTap: () => _navigateToUserProfile(context),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-              // Uncomment below if status needed
-              // Text(status, style: const TextStyle(fontSize: 12, color: AppColors.background)),
+              CircleAvatar(
+                radius: 18,
+                backgroundImage: CachedNetworkImageProvider(profilePicture),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.background)),
+                  Text("@$userName", style: const TextStyle(fontSize: 12, color: AppColors.background)),
+                ],
+              ),
             ],
           ),
         ),

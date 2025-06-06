@@ -95,22 +95,34 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   @override
   Future<List<Map<String, dynamic>>> getMessagesByRecipient(
     String recipientId, {
-    int? limit,
-    String? cursor
+    int? limit = 18,
+    String? cursor = "",
   }) async {
-    final token = await authSession.getSessionToken();
-    if (token == null) throw const NetworkException('Unauthorized');
+    try {
+      final token = await authSession.getSessionToken();
+      if (token == null) throw const NetworkException('Unauthorized');
 
-    final response = await apiClient.get(
-      ChatApiConstants.getMessagesByRecipient(recipientId, limit = 10, cursor),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+      final endpoint =
+          cursor != null
+              ? ChatApiConstants.getMessagesByRecipient(
+                recipientId,
+                limit,
+                cursor,
+              )
+              : ChatApiConstants.getMessagesByRecipient(recipientId, limit);
+      final response = await apiClient.get(
+        endpoint,
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
-    if (response is! List) {
-      throw const NetworkException('Invalid message list response');
+      if (response is! List) {
+        throw const NetworkException('Invalid message list response');
+      }
+
+      return response.cast<Map<String, dynamic>>();
+    } catch (e) {
+      throw NetworkException('Failed to fetch msg: $e');
     }
-
-    return response.cast<Map<String, dynamic>>();
   }
 
   @override
@@ -122,7 +134,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       ChatApiConstants.getConversations,
       headers: {'Authorization': 'Bearer $token'},
     );
-    
+
     if (response is! List) {
       throw const NetworkException('Invalid conversation list response');
     }
@@ -177,7 +189,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
-    
+
     if (response is! List) {
       throw const NetworkException('Invalid user search response');
     }

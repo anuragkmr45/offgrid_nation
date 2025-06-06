@@ -21,7 +21,7 @@ class LastMessageEntity extends Equatable {
 
   factory LastMessageEntity.fromJson(Map<String, dynamic> json) {
     return LastMessageEntity(
-      text: json['text'],
+      text: json['text'] ?? "",
       attachments: MessageEntity.parseAttachments(json['attachments']),
       senderId: json['sender'] ?? '',
       sentAt: DateTime.parse(json['sentAt']),

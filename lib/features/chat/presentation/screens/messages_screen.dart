@@ -109,12 +109,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       final chat = conversations[index];
 
                       // 🚨 SKIP if lastMessage is null
-                      if (chat.lastMessage == null) {
+                      if (chat.lastMessage == "") {
                         return const SizedBox.shrink();
                       }
 
                       final user = chat.user;
-                      final lastMessage = chat.lastMessage!;
+                      final lastMessage = chat.lastMessage;
 
                       final String avatarUrl = user.profilePicture;
                       final String userName = user.fullName;
@@ -128,7 +128,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
                       final String timeLabel = _formatTime(lastMessage.sentAt);
                       final int unreadCount = chat.unreadCount;
-
+                      
                       return ChatListItem(
                         avatarUrl: avatarUrl,
                         userName: userName,
@@ -143,6 +143,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               'conversationId': chat.conversationId,
                               'recipientId': user.id,
                               'recipientName': user.fullName,
+                              'recipientUsername': user.username,
+                              'profilePicture': user.profilePicture,
                               'status': chat.muted ? 'Muted' : 'Active now',
                             },
                           );
