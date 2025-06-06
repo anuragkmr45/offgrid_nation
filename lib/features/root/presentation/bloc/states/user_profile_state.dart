@@ -28,10 +28,11 @@ class UserProfileState with EquatableMixin {
   final int? userPostsLimit;
   final bool isPaginating;
   final bool hasMorePosts;
+  final UserProfileStatus profileStatus;
+  final UserProfileStatus postsStatus;
   final String? errorMessage;
 
   const UserProfileState({
-    this.status = UserProfileStatus.initial,
     this.profileData,
     this.userProfileData,
     this.updateProfileData,
@@ -48,6 +49,9 @@ class UserProfileState with EquatableMixin {
     this.isPaginating = false,
     this.hasMorePosts = true,
     this.errorMessage,
+    this.profileStatus = UserProfileStatus.initial,
+    this.postsStatus = UserProfileStatus.initial,
+    this.status = UserProfileStatus.initial,
   });
 
   UserProfileState copyWith({
@@ -68,6 +72,8 @@ class UserProfileState with EquatableMixin {
     bool? isPaginating,
     bool? hasMorePosts,
     String? errorMessage,
+    UserProfileStatus? profileStatus,
+    UserProfileStatus? postsStatus,
   }) {
     return UserProfileState(
       status: status ?? this.status,
@@ -89,27 +95,31 @@ class UserProfileState with EquatableMixin {
       isPaginating: isPaginating ?? this.isPaginating,
       hasMorePosts: hasMorePosts ?? this.hasMorePosts,
       errorMessage: errorMessage ?? this.errorMessage,
+      profileStatus: profileStatus ?? this.profileStatus,
+      postsStatus: postsStatus ?? this.postsStatus,
     );
   }
 
   @override
   List<Object?> get props => [
-        status,
-        profileData,
-        userProfileData,
-        updateProfileData,
-        profilePictureUrl,
-        followersData,
-        followingData,
-        blockedUsersData,
-        followRequestsData,
-        toggleFollowUnfollowData,
-        toggleBlockUnblockData,
-        userPosts,
-        userPostsCursor,
-        userPostsLimit,
-        isPaginating,
-        hasMorePosts,
-        errorMessage,
-      ];
+    status,
+    profileData,
+    userProfileData,
+    updateProfileData,
+    profilePictureUrl,
+    followersData,
+    followingData,
+    blockedUsersData,
+    followRequestsData,
+    toggleFollowUnfollowData,
+    toggleBlockUnblockData,
+    userPosts,
+    userPostsCursor,
+    userPostsLimit,
+    isPaginating,
+    hasMorePosts,
+    errorMessage,
+    profileStatus,
+    postsStatus,
+  ];
 }
