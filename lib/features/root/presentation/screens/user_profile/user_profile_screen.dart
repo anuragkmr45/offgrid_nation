@@ -109,11 +109,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       child: SafeArea(
         child: BlocBuilder<UserProfileBloc, UserProfileState>(
           builder: (context, state) {
-            if (state.status == UserProfileStatus.loading) {
+            if (state.profileStatus == UserProfileStatus.loading) {
               return const CustomLoader();
             }
 
-            if (state.status == UserProfileStatus.failure) {
+            if (state.profileStatus == UserProfileStatus.failure) {
               return Center(
                 child: Text(state.errorMessage ?? 'Error loading profile'),
               );
@@ -177,11 +177,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       body: SafeArea(
         child: BlocBuilder<UserProfileBloc, UserProfileState>(
           builder: (context, state) {
-            if (state.status == UserProfileStatus.loading) {
+            if (state.profileStatus == UserProfileStatus.loading) {
               return const CustomLoader();
             }
 
-            if (state.status == UserProfileStatus.failure) {
+            if (state.profileStatus == UserProfileStatus.failure) {
               return Center(child: Text(state.errorMessage ?? 'Error'));
             }
 

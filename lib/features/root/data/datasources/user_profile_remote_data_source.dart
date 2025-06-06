@@ -75,12 +75,11 @@ class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
           ApiConstants.viewUserEndpoint
               .replaceFirst(':username', userId)
               .toString();
-      print("---------endpointendpoint----------$userId");
+              
       final response = await apiClient.get(
         endpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
-      print("---------endpointendpointresponse----------$response");
 
       if (response == null || response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid response format');

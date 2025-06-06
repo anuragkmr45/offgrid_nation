@@ -279,7 +279,7 @@ Future<void> _onFetchPostsByUsername(
   final isInitialFetch = event.cursor == null;
 
   if (isInitialFetch) {
-    emit(state.copyWith(status: UserProfileStatus.loading));
+    emit(state.copyWith(postsStatus: UserProfileStatus.loading));
   } else {
     emit(state.copyWith(isPaginating: true));
   }
@@ -300,7 +300,7 @@ Future<void> _onFetchPostsByUsername(
 
     emit(
       state.copyWith(
-        status: UserProfileStatus.loaded,
+        postsStatus: UserProfileStatus.loaded,
         userPosts: combinedPosts,
         userPostsCursor: newCursor,
         isPaginating: false,
@@ -310,7 +310,7 @@ Future<void> _onFetchPostsByUsername(
   } catch (error) {
     emit(
       state.copyWith(
-        status: UserProfileStatus.failure,
+        postsStatus: UserProfileStatus.failure,
         errorMessage: ErrorHandler.handle(error),
         isPaginating: false,
       ),

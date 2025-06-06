@@ -30,14 +30,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
-        value: context.read<ChatBloc>(),
-        child: SearchUserBottomSheet(
-          onUserSelected: (user) {
-            Navigator.pop(context, user);
-          },
-        ),
-      ),
+      builder:
+          (_) => BlocProvider.value(
+            value: context.read<ChatBloc>(),
+            child: SearchUserBottomSheet(
+              onUserSelected: (user) {
+                Navigator.pop(context, user);
+              },
+            ),
+          ),
     );
 
     // Restore conversations after search modal is closed
@@ -84,9 +85,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
               builder: (context, state) {
                 if (state is ChatLoading) {
                   return Center(
-                    child: isIOS
-                        ? const CupertinoActivityIndicator()
-                        : const CircularProgressIndicator(),
+                    child:
+                        isIOS
+                            ? const CupertinoActivityIndicator()
+                            : const CircularProgressIndicator(),
                   );
                 } else if (state is ConversationsLoaded) {
                   final conversations = state.conversations;
@@ -105,8 +107,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     separatorBuilder: (_, __) => const SizedBox.shrink(),
                     itemBuilder: (context, index) {
                       final chat = conversations[index];
+
+                      // 🚨 SKIP if lastMessage is null
+                      if (chat.lastMessage == null) {
+                        return const SizedBox.shrink();
+                      }
+
                       final user = chat.user;
-                      final lastMessage = chat.lastMessage;
+                      final lastMessage = chat.lastMessage!;
 
                       final String avatarUrl = user.profilePicture;
                       final String userName = user.fullName;
@@ -118,8 +126,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                   ? '📷 Media'
                                   : '');
 
-                      final String timeLabel =
-                          _formatTime(lastMessage.sentAt);
+                      final String timeLabel = _formatTime(lastMessage.sentAt);
                       final int unreadCount = chat.unreadCount;
 
                       return ChatListItem(
@@ -162,15 +169,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     return isIOS
         ? CupertinoPageScaffold(
-            navigationBar: const CupertinoNavigationBar(
-              middle: Text('Messages'),
-            ),
-            child: SafeArea(child: content),
-          )
+          navigationBar: const CupertinoNavigationBar(middle: Text('Messages')),
+          child: SafeArea(child: content),
+        )
         : Scaffold(
-            backgroundColor: AppColors.primary,
-            body: SafeArea(child: content),
-          );
+          backgroundColor: AppColors.primary,
+          body: SafeArea(child: content),
+        );
   }
 
   String _formatTime(DateTime dateTime) {
