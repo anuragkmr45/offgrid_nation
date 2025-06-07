@@ -13,7 +13,6 @@ import 'package:offgrid_nation_app/features/chat/presentation/screens/messages_s
 import 'package:offgrid_nation_app/features/root/presentation/screens/premium_screen.dart';
 import 'package:offgrid_nation_app/injection_container.dart';
 
-/// RootScreen manages the bottom navigation's state and shows the appropriate page.
 class RootScreen extends StatefulWidget {
   const RootScreen({super.key});
 
@@ -22,38 +21,51 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> {
-  // Holds the current tab index.
   int _currentTabIndex = 0;
 
-  final List<Widget> _screens = [
-    BlocProvider<ContentBloc>(
-      // ✅ Provide ContentBloc ONLY to FeedScreen
-      create: (_) => sl<ContentBloc>(),
-      child: const FeedScreen(),
-    ),
-    BlocProvider<SearchUserBloc>(
-      // ✅ Provide SearchUserBloc ONLY to SearchScreen
-      create: (_) => sl<SearchUserBloc>(),
-      child: const SearchScreen(),
-    ),
-    const AddPostScreen(),
-    BlocProvider<ChatBloc>(
-      create: (_) => sl<ChatBloc>(),
-      child: AutoFetchWrapper(child: const MessagesScreen()),
-    ),
+  late final List<bool> _isTabBuilt = List.filled(5, false);
 
-    const PremiumScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _isTabBuilt[0] = true; // First tab should build initially
+  }
 
-  // Updates the current tab index when a navigation icon is tapped.
   void _onTabSelected(int index) {
     if (_currentTabIndex == index && index == 3) {
-      // Tab already active AND it's the Chat tab (index 3)
+      // If Chat tab tapped again → force refresh
       sl<ChatBloc>().add(const GetConversationsRequested());
     } else {
       setState(() {
         _currentTabIndex = index;
+        _isTabBuilt[index] = true; // Mark tab as visited → allow building
       });
+    }
+  }
+
+  Widget _buildTabScreen(int index) {
+    switch (index) {
+      case 0:
+        return BlocProvider<ContentBloc>(
+          create: (_) => sl<ContentBloc>(),
+          child: const FeedScreen(),
+        );
+      case 1:
+        return BlocProvider<SearchUserBloc>(
+          create: (_) => sl<SearchUserBloc>(),
+          child: const SearchScreen(),
+        );
+      case 2:
+        return const AddPostScreen();
+      case 3:
+        return BlocProvider<ChatBloc>(
+          create: (_) => sl<ChatBloc>(),
+          child: AutoFetchWrapper(child: const MessagesScreen()),
+        );
+      case 4:
+        return const PremiumScreen();
+      default:
+        return const SizedBox.shrink(); // Always safe fallback
     }
   }
 
@@ -62,7 +74,19 @@ class _RootScreenState extends State<RootScreen> {
     return MainWrapper(
       currentTabIndex: _currentTabIndex,
       onTabSelected: _onTabSelected,
-      child: IndexedStack(index: _currentTabIndex, children: _screens),
+      child: Stack(
+        children: List.generate(5, (index) {
+          return Offstage(
+            offstage: _currentTabIndex != index,
+            child: TickerMode(
+              enabled: _currentTabIndex == index,
+              child: _isTabBuilt[index]
+                  ? _buildTabScreen(index)
+                  : const SizedBox.shrink(),
+            ),
+          );
+        }),
+      ),
     );
   }
 }

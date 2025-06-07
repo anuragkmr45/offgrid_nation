@@ -58,6 +58,7 @@ dependencies:
   geocoding: ^3.0.0
   cached_network_image: ^3.4.1
   flutter_stripe: ^11.5.0
+  pusher_channels_flutter: ^2.4.0
 
 dev_dependencies:
   flutter_test:

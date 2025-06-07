@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 
 abstract class ChatEvent extends Equatable {
   const ChatEvent();
@@ -78,4 +79,12 @@ class GetMessagesByRecipientRequested extends ChatEvent {
 
   @override
   List<Object?> get props => [recipientId, limit, cursor];
+}
+
+class PushNewMessageReceived extends ChatEvent {
+  final MessageEntity message;
+  const PushNewMessageReceived(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }
