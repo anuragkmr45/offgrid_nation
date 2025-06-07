@@ -1,6 +1,7 @@
 // 📁 lib/features/chat/presentation/bloc/chat_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/errors/network_exception.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_by_recipient_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/send_message_usecase.dart';
@@ -44,16 +45,35 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<DeleteConversationRequested>(_onDeleteConversation);
     on<SearchUsersRequested>(_onSearchUsers);
     on<GetMessagesByRecipientRequested>(_onGetMessagesByRecipient);
+    on<PushNewMessageReceived>(_onPushNewMessageReceived);
   }
 
   Future<void> _onSendMessage(
     SendMessageRequested event,
     Emitter<ChatState> emit,
   ) async {
-    emit(ChatLoading());
     try {
       final result = await sendMessageUsecase(event.body);
-      emit(SendMessageSuccess(result));
+
+      // Instead of emitting SendMessageSuccess → just trigger PushNewMessageReceived
+      if (state is MessagesLoaded) {
+        final currentMessages = (state as MessagesLoaded).messages;
+
+        final alreadyExists = currentMessages.any((m) => m.id == result.id);
+
+        if (!alreadyExists) {
+          final updatedMessages = [result, ...currentMessages];
+          emit(MessagesLoaded(updatedMessages)); // 👈 always emit this
+        } else {
+          emit(MessagesLoaded(currentMessages)); // keep same
+        }
+      } else {
+        // No messages loaded yet → emit MessagesLoaded
+        emit(MessagesLoaded([result]));
+      }
+
+      // ⚠️ REMOVE this → this is causing state change to SendMessageSuccess
+      // add(PushNewMessageReceived(result));
     } catch (e) {
       emit(
         ChatError(
@@ -204,7 +224,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     emit(ChatLoading());
     try {
-      final messages = await getMessagesByRecipientUsecase(event.recipientId, event.limit, event.cursor);
+      final messages = await getMessagesByRecipientUsecase(
+        event.recipientId,
+        event.limit,
+        event.cursor,
+      );
       emit(MessagesLoaded(messages));
     } catch (e) {
       emit(
@@ -212,6 +236,41 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           e is NetworkException
               ? (e.message ?? 'Unexpected error')
               : 'Failed to load messages',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onPushNewMessageReceived(
+    PushNewMessageReceived event,
+    Emitter<ChatState> emit,
+  ) async {
+    try {
+      if (state is MessagesLoaded) {
+        final currentMessages = (state as MessagesLoaded).messages;
+
+        // SAFETY: Check if message already exists (avoid duplicates)
+        final alreadyExists = currentMessages.any(
+          (m) => m.id == event.message.id,
+        );
+
+        if (!alreadyExists) {
+          final updatedMessages = [event.message, ...currentMessages];
+          emit(MessagesLoaded(updatedMessages));
+        } else {
+          // No-op if duplicate
+          emit(MessagesLoaded(currentMessages));
+        }
+      } else {
+        // If no messages loaded yet → start with this one
+        emit(MessagesLoaded([event.message]));
+      }
+    } catch (e) {
+      emit(
+        ChatError(
+          e is NetworkException
+              ? (e.message ?? 'Unexpected error')
+              : 'Failed to process new message',
         ),
       );
     }
