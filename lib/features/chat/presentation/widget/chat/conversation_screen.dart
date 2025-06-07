@@ -138,46 +138,80 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final bodyContent = Column(
       children: [
         Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              if (scrollNotification is ScrollEndNotification &&
-                  _scrollController.position.pixels >=
-                      _scrollController.position.maxScrollExtent - 200 &&
-                  !_isLoadingMore &&
-                  _hasMore &&
-                  _messages.isNotEmpty) {
-                _fetchOlderMessages();
+          child: BlocConsumer<ChatBloc, ChatState>(
+            listener: (context, state) {
+              if (state is MessagesLoaded && !_isLoadingMore) {
+                _scrollToBottom();
               }
-              return false;
             },
-            child: ListView.builder(
-              reverse: true,
-              controller: _scrollController,
-              physics:
-                  const AlwaysScrollableScrollPhysics(), // 🟢 THIS FIXES your UI stuck issue
-              itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (_isLoadingMore && index == _messages.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
+            builder: (context, state) {
+              if (state is MessagesLoaded) {
+                if (_isLoadingMore) {
+                  final newMessages =
+                      state.messages.where((newMsg) {
+                        return !_messages.any(
+                          (existingMsg) => existingMsg.id == newMsg.id,
+                        );
+                      }).toList();
 
-                final msg = _messages[index];
-                final bool isMe =
-                    _myUserId != null && msg.sender.id == _myUserId;
-                return ChatBubble(
-                  message: msg.text ?? '',
-                  time: _formatTime(msg.sentAt),
-                  isMe: isMe,
-                );
-              },
-            ),
+                  if (newMessages.isEmpty) {
+                    _hasMore = false;
+                  } else {
+                    _messages.addAll(newMessages);
+                  }
+
+                  _isLoadingMore = false;
+                } else {
+                  // Initial load or after send
+                  _messages = state.messages;
+                  _hasMore = true;
+                  _isLoadingMore = false;
+                  _cursor = null;
+                }
+              }
+
+              return NotificationListener<ScrollNotification>(
+                onNotification: (scrollNotification) {
+                  if (scrollNotification is ScrollEndNotification &&
+                      _scrollController.position.pixels >=
+                          _scrollController.position.maxScrollExtent - 200 &&
+                      !_isLoadingMore &&
+                      _hasMore &&
+                      _messages.isNotEmpty) {
+                    _fetchOlderMessages();
+                  }
+                  return false;
+                },
+                child: ListView.builder(
+                  reverse: true,
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (_isLoadingMore && index == _messages.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    final msg = _messages[index];
+                    final bool isMe =
+                        _myUserId != null && msg.sender.id == _myUserId;
+                    return ChatBubble(
+                      message: msg.text ?? '',
+                      time: _formatTime(msg.sentAt),
+                      isMe: isMe,
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ),
+
         ChatInput(onSend: _handleSend),
       ],
     );

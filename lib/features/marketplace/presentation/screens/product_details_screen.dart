@@ -48,15 +48,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       value: _bloc,
       child: Scaffold(
         appBar: AppBar(title: const Text("Product Details")),
-        bottomNavigationBar: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: CustomButton(
-              text: "Chat with Seller",
-              onPressed: () {},
-              loading: false,
-            ),
-          ),
+        bottomNavigationBar: BlocBuilder<MarketplaceBloc, MarketplaceState>(
+          builder: (context, state) {
+            if (state is ProductDetailsLoaded) {
+              final owner = state.product.owner;
+              print("==========owner========= ${owner.userId}");
+              print("==========owner========= ${owner.username}");
+              print("==========owner========= ${owner.profilePicture}");
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: CustomButton(
+                    text: "Chat with Seller",
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/conversation',
+                        arguments: {
+                          'recipientId': owner.userId,
+                          'recipientName': owner.username,
+                          'recipientUsername': owner.username,
+                          'profilePicture': owner.profilePicture,
+                          'status': '',
+                        },
+                      );
+                    },
+                    loading: false,
+                  ),
+                ),
+              );
+            }
+
+            // Hide button for loading/error states
+            return const SizedBox();
+          },
         ),
         body: BlocBuilder<MarketplaceBloc, MarketplaceState>(
           builder: (context, state) {
@@ -65,7 +93,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             }
 
             if (state is MarketplaceFailure || state is MarketplaceError) {
-              return const Center(child: Text("Failed to load product details."));
+              return const Center(
+                child: Text("Failed to load product details."),
+              );
             }
 
             if (state is ProductDetailsLoaded) {
@@ -80,7 +110,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ProductDetailsInfo(product: product),
-                    )
+                    ),
                   ],
                 ),
               );
