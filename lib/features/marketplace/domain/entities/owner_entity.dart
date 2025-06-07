@@ -1,4 +1,3 @@
-// lib/features/marketplace/domain/entities/owner_entity.dart
 class OwnerEntity {
   final String userId;
   final String username;
