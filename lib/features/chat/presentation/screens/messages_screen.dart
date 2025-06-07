@@ -101,56 +101,71 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       ),
                     );
                   }
-
-                  return ListView.separated(
-                    itemCount: conversations.length,
-                    separatorBuilder: (_, __) => const SizedBox.shrink(),
-                    itemBuilder: (context, index) {
-                      final chat = conversations[index];
-
-                      // 🚨 SKIP if lastMessage is null
-                      if (chat.lastMessage == "") {
-                        return const SizedBox.shrink();
-                      }
-
-                      final user = chat.user;
-                      final lastMessage = chat.lastMessage;
-
-                      final String avatarUrl = user.profilePicture;
-                      final String userName = user.fullName;
-
-                      final String lastMessageText =
-                          lastMessage.text?.trim().isNotEmpty == true
-                              ? lastMessage.text!
-                              : (lastMessage.attachments.isNotEmpty
-                                  ? '📷 Media'
-                                  : '');
-
-                      final String timeLabel = _formatTime(lastMessage.sentAt);
-                      final int unreadCount = chat.unreadCount;
-                      
-                      return ChatListItem(
-                        avatarUrl: avatarUrl,
-                        userName: userName,
-                        lastMessage: lastMessageText,
-                        timeLabel: timeLabel,
-                        unreadCount: unreadCount,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/conversation',
-                            arguments: {
-                              'conversationId': chat.conversationId,
-                              'recipientId': user.id,
-                              'recipientName': user.fullName,
-                              'recipientUsername': user.username,
-                              'profilePicture': user.profilePicture,
-                              'status': chat.muted ? 'Muted' : 'Active now',
-                            },
-                          );
-                        },
+                  return RefreshIndicator(
+                    color: Colors.blueAccent, // customize color
+                    onRefresh: () async {
+                      // Trigger refresh
+                      context.read<ChatBloc>().add(
+                        const GetConversationsRequested(),
                       );
+                      await Future.delayed(
+                        const Duration(milliseconds: 500),
+                      ); // optional smooth
                     },
+                    child: ListView.separated(
+                      physics:
+                          const AlwaysScrollableScrollPhysics(), // required
+                      itemCount: conversations.length,
+                      separatorBuilder: (_, __) => const SizedBox.shrink(),
+                      itemBuilder: (context, index) {
+                        final chat = conversations[index];
+
+                        // 🚨 SKIP if lastMessage is null
+                        if (chat.lastMessage == "") {
+                          return const SizedBox.shrink();
+                        }
+
+                        final user = chat.user;
+                        final lastMessage = chat.lastMessage;
+
+                        final String avatarUrl = user.profilePicture;
+                        final String userName = user.fullName;
+
+                        final String lastMessageText =
+                            lastMessage.text?.trim().isNotEmpty == true
+                                ? lastMessage.text!
+                                : (lastMessage.attachments.isNotEmpty
+                                    ? '📷 Media'
+                                    : '');
+
+                        final String timeLabel = _formatTime(
+                          lastMessage.sentAt,
+                        );
+                        final int unreadCount = chat.unreadCount;
+
+                        return ChatListItem(
+                          avatarUrl: avatarUrl,
+                          userName: userName,
+                          lastMessage: lastMessageText,
+                          timeLabel: timeLabel,
+                          unreadCount: unreadCount,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/conversation',
+                              arguments: {
+                                'conversationId': chat.conversationId,
+                                'recipientId': user.id,
+                                'recipientName': user.fullName,
+                                'recipientUsername': user.username,
+                                'profilePicture': user.profilePicture,
+                                'status': chat.muted ? 'Muted' : 'Active now',
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   );
                 } else if (state is ChatError) {
                   return Center(

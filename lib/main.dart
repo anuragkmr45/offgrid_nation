@@ -20,8 +20,8 @@ Future<void> main() async {
   await di.init();
 
  
-  const pusherKey = '<YOUR_PUSHER_KEY>'; // Example: '15fb3af3b13dcd9b4924'
-  const pusherCluster = '<YOUR_CLUSTER>'; // Example: 'us3'
+  const pusherKey = '15fb3af3b13dcd9b4924';
+  const pusherCluster = 'us3';
 
   await PusherService().initPusher(
     apiKey: pusherKey,
