@@ -14,6 +14,10 @@ class ChatInitial extends ChatState {}
 
 class ChatLoading extends ChatState {}
 
+class SendPostMessageSuccess extends ChatState {}
+
+class SendingPostMessage extends ChatState {}
+
 class SendMessageSuccess extends ChatState {
   final MessageEntity response;
   const SendMessageSuccess(this.response);

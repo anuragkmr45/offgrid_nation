@@ -95,7 +95,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 (state.profileData?['fullName'] ?? '').toString().trim();
             final username =
                 (state.profileData?['username'] ?? '').toString().trim();
-            final title = name.isNotEmpty ? name : '@$username';
+            final title = name.isNotEmpty ? name : username;
 
             return Text(
               title,
@@ -162,7 +162,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 (state.profileData?['fullName'] ?? '').toString().trim();
             final username =
                 (state.profileData?['username'] ?? '').toString().trim();
-            final title = name.isNotEmpty ? name : '@$username';
+            final title = name.isNotEmpty ? name : username;
             return Text(
               title,
               style: const TextStyle(color: AppColors.background),

@@ -25,6 +25,7 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
   String? _selectedCategoryId;
   // bool _isSearchActive = false;
   late final MarketplaceBloc _bloc;
+  bool _isFetching = false;
 
   @override
   void initState() {
@@ -39,15 +40,26 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
       searchProductsUseCase: sl(),
     );
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _fetchProductsWithLocation(),
+      (_) => _fetchProductsWithLocation(isInitial: true),
     );
   }
 
-  Future<void> _fetchProductsWithLocation() async {
+  Future<void> _fetchProductsWithLocation({bool isInitial = false}) async {
+    if (isInitial) {
+      setState(() {
+        _isInitializing = true;
+      });
+    } else {
+      setState(() {
+        _isFetching = true;
+      });
+    }
+
     final granted = await LocationUtils.requestLocationPermission();
     if (!granted) {
       setState(() {
         _isInitializing = false;
+        _isFetching = false;
         _errorText =
             'Location permission denied. Please enable location to view nearby products.';
       });
@@ -62,6 +74,7 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
       if (lat != null && lng != null) {
         final locationName = await LocationUtils.getReadableLocation(lat, lng);
         setState(() => _userLocation = locationName ?? "Unknown Location");
+
         _bloc.add(
           FetchProductsRequested(
             latitude: lat,
@@ -70,13 +83,17 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
           ),
         );
 
-        setState(() => _isInitializing = false);
+        setState(() {
+          _isInitializing = false;
+          _isFetching = false;
+        });
         return;
       }
     }
 
     setState(() {
       _isInitializing = false;
+      _isFetching = false;
       _errorText =
           'Unable to determine your location. Please check location settings and try again.';
     });
@@ -89,10 +106,13 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
   }
 
   Future<void> setCategoryAndFetch(String? categoryId) async {
+    print(
+      "++++++++++++++++++++++++++++categoryId+++++++++++++++++++++$categoryId",
+    );
     if (categoryId == null || categoryId.isEmpty) return;
 
     _selectedCategoryId = categoryId;
-    await _fetchProductsWithLocation();
+    await _fetchProductsWithLocation(isInitial: false);
   }
 
   @override
@@ -129,7 +149,20 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
                     );
                   }
                 },
-                child: MarketplaceWrapper(child: _buildScrollView(context)),
+                child: Stack(
+                  children: [
+                    MarketplaceWrapper(child: _buildScrollView(context)),
+                    if (_isFetching)
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.1),
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
     );
   }

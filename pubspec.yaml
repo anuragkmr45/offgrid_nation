@@ -51,14 +51,13 @@ dependencies:
   flutter_svg: ^2.1.0
   geolocator: ^14.0.0
   app_settings: ^6.1.1
-  video_player: ^2.9.5
   share_plus: ^11.0.0
   dart_jsonwebtoken: ^3.2.0
   firebase_crashlytics: ^4.3.5
   geocoding: ^3.0.0
   cached_network_image: ^3.4.1
-  flutter_stripe: ^11.5.0
   pusher_channels_flutter: ^2.4.0
+  # flutter_local_notifications: ^19.2.1
 
 dev_dependencies:
   flutter_test:

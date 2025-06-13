@@ -13,7 +13,7 @@ abstract class ChatRepository {
   Future<List<MessageEntity>> getMessagesByRecipient(
     String conversationId, {
     int? limit,
-    String? cursor
+    String? cursor,
   });
 
   Future<String> uploadMedia(String endpoint, String filePath);
@@ -27,4 +27,10 @@ abstract class ChatRepository {
   Future<void> deleteConversation(String conversationId);
 
   Future<List<ChatUserEntity>> searchUsers(String query);
+
+  Future<Map<String, dynamic>> sendPostMessage({
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  });
 }

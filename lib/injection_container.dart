@@ -66,6 +66,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_rep
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/content_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_comments_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_replies_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/content/send_post_message_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_comment_like_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_like_dislike_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/fetch_notifications_usecase.dart';
@@ -346,12 +347,12 @@ Future<void> init() async {
   // ─────────────────────────────────────────────────────────────────
   // notifications
   // ─────────────────────────────────────────────────────────────────
-sl.registerLazySingleton<NotificationRemoteDataSource>(
-  () => NotificationRemoteDataSourceImpl(
-    apiClient: sl<ApiClient>(),
-    authSession: sl<AuthSession>(),
-  ),
-);
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      authSession: sl<AuthSession>(),
+    ),
+  );
 
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
@@ -360,17 +361,15 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
   sl.registerLazySingleton(() => FetchNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkNotificationsReadUseCase(sl()));
   sl.registerFactory(
-    () =>  NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
+    () =>
+        NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
   );
 
   // ─────────────────────────────────────────────────────────────────────────────
   // 💬 Chat Module
   // ─────────────────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<ChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(
-      apiClient: sl(),
-      authSession: sl(),
-    ),
+    () => ChatRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
   );
 
   sl.registerLazySingleton<ChatRepository>(
@@ -388,17 +387,20 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
   sl.registerLazySingleton<GetMessagesByRecipientUsecase>(
     () => GetMessagesByRecipientUsecase(sl()),
   );
+  sl.registerLazySingleton(() => SendPostMessageUsecase(sl()));
 
-
-  sl.registerFactory(() => ChatBloc(
-        sendMessageUsecase: sl(),
-        getMessagesUsecase: sl(),
-        uploadMediaUsecase: sl(),
-        getConversationsUsecase: sl(),
-        markReadUsecase: sl(),
-        muteUsecase: sl(),
-        deleteUsecase: sl(),
-        searchUsersUsecase: sl(), 
-        getMessagesByRecipientUsecase: sl(),
-      ));
+  sl.registerFactory(
+    () => ChatBloc(
+      sendMessageUsecase: sl(),
+      getMessagesUsecase: sl(),
+      uploadMediaUsecase: sl(),
+      getConversationsUsecase: sl(),
+      markReadUsecase: sl(),
+      muteUsecase: sl(),
+      deleteUsecase: sl(),
+      searchUsersUsecase: sl(),
+      getMessagesByRecipientUsecase: sl(),
+      sendPostMessageUsecase: sl(),
+    ),
+  );
 }

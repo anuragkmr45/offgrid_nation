@@ -31,7 +31,7 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<List<MessageEntity>> getMessagesByRecipient(
     String recipientId, {
     int? limit,
-    String? cursor
+    String? cursor,
   }) async {
     final result = await remoteDataSource.getMessagesByRecipient(
       recipientId,
@@ -71,5 +71,18 @@ class ChatRepositoryImpl implements ChatRepository {
   @override
   Future<List<ChatUserEntity>> searchUsers(String query) async {
     return await remoteDataSource.searchUsers(query);
+  }
+
+  @override
+  Future<Map<String, dynamic>> sendPostMessage({
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  }) {
+    return remoteDataSource.sendPostMessage(
+      recipientId: recipientId,
+      postId: postId,
+      conversationId: conversationId,
+    );
   }
 }

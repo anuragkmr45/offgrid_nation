@@ -60,4 +60,17 @@ class ContentRepositoryImpl implements ContentRepository {
   }) async {
     return await remote.fetchReplies(commentId, limit: limit, cursor: cursor);
   }
+
+  @override
+  Future<Map<String, dynamic>> sendPostMessage({
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  }) {
+    return remote.sendPostMessage(
+      recipientId: recipientId,
+      postId: postId,
+      conversationId: conversationId,
+    );
+  }
 }

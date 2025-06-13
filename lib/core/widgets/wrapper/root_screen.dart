@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/widgets/wrapper/main_wrapper.dart';
-import 'package:offgrid_nation_app/features/chat/domain/utils/auto_fetch_wrapper.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
@@ -46,10 +45,14 @@ class _RootScreenState extends State<RootScreen> {
   Widget _buildTabScreen(int index) {
     switch (index) {
       case 0:
-        return BlocProvider<ContentBloc>(
-          create: (_) => sl<ContentBloc>(),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<ContentBloc>(create: (_) => sl<ContentBloc>()),
+            BlocProvider<ChatBloc>(create: (_) => sl<ChatBloc>()),
+          ],
           child: const FeedScreen(),
         );
+
       case 1:
         return BlocProvider<SearchUserBloc>(
           create: (_) => sl<SearchUserBloc>(),
@@ -60,7 +63,7 @@ class _RootScreenState extends State<RootScreen> {
       case 3:
         return BlocProvider<ChatBloc>(
           create: (_) => sl<ChatBloc>(),
-          child: AutoFetchWrapper(child: const MessagesScreen()),
+          child: const MessagesScreen(),
         );
       case 4:
         return const PremiumScreen();
@@ -80,9 +83,10 @@ class _RootScreenState extends State<RootScreen> {
             offstage: _currentTabIndex != index,
             child: TickerMode(
               enabled: _currentTabIndex == index,
-              child: _isTabBuilt[index]
-                  ? _buildTabScreen(index)
-                  : const SizedBox.shrink(),
+              child:
+                  _isTabBuilt[index]
+                      ? _buildTabScreen(index)
+                      : const SizedBox.shrink(),
             ),
           );
         }),

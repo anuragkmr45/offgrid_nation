@@ -91,6 +91,34 @@ class LocationUtils {
         : null;
   }
 
+  static Future<void> ensureLocationServiceEnabled(BuildContext context) async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // On Android: can open system location settings
+      if (Platform.isAndroid) {
+        await Geolocator.openLocationSettings();
+      } else if (Platform.isIOS) {
+        // On iOS, can only show guidance, cannot open GPS settings directly
+        await showDialog(
+          context: context,
+          builder:
+              (context) => CupertinoAlertDialog(
+                title: const Text('Enable Location Services'),
+                content: const Text(
+                  'Please enable Location Services from Settings > Privacy > Location Services.',
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+        );
+      }
+    }
+  }
+
   static Future<String?> getReadableLocation(
     double latitude,
     double longitude,
