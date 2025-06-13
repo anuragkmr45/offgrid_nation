@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class MediaCarousel extends StatefulWidget {
   final List<String> mediaUrls;
@@ -49,12 +48,11 @@ class _MediaCarouselState extends State<MediaCarousel> {
             width: isActive ? 12 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color:
-                  isActive
-                      ? (Platform.isIOS
-                          ? CupertinoColors.activeBlue
-                          : Colors.blue)
-                      : Colors.grey,
+              color: isActive
+                  ? (Platform.isIOS
+                      ? CupertinoColors.activeBlue
+                      : Colors.blue)
+                  : Colors.grey,
               borderRadius: BorderRadius.circular(3),
             ),
           );
@@ -81,24 +79,30 @@ class _MediaCarouselState extends State<MediaCarousel> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child:
-                      isVideo(url)
-                          ? VideoPlayerWidget(videoUrl: url)
-                          : Image.network(
-                            url,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
-                            errorBuilder:
-                                (context, _, __) => const Center(
-                                  child: Icon(Icons.broken_image, size: 40),
-                                ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        url,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                        errorBuilder: (context, _, __) =>
+                            const Center(child: Icon(Icons.broken_image, size: 40)),
+                      ),
+                      if (isVideo(url))
+                        Container(
+                          color: Colors.black.withOpacity(0.3),
+                          child: const Center(
+                            child: Icon(Icons.play_circle_fill, size: 64, color: Colors.white),
                           ),
+                        ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -107,48 +111,5 @@ class _MediaCarouselState extends State<MediaCarousel> {
         ],
       ),
     );
-  }
-}
-
-class VideoPlayerWidget extends StatefulWidget {
-  final String videoUrl;
-
-  const VideoPlayerWidget({super.key, required this.videoUrl});
-
-  @override
-  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
-}
-
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _controller;
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) {
-        _controller.setLooping(true);
-        _controller.play();
-        setState(() {
-          _isInitialized = true;
-        });
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _isInitialized
-        ? AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
-        )
-        : const Center(child: CircularProgressIndicator());
   }
 }

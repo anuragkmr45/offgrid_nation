@@ -1,4 +1,5 @@
 // 📁 lib/features/chat/presentation/bloc/chat_bloc.dart
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/core/errors/network_exception.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
@@ -13,6 +14,7 @@ import 'package:offgrid_nation_app/features/chat/domain/usecases/mute_conversati
 import 'package:offgrid_nation_app/features/chat/domain/usecases/delete_conversation_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/domain/usecases/search_users_usecase.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/states/chat_state.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/content/send_post_message_usecase.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final SendMessageUsecase sendMessageUsecase;
@@ -24,6 +26,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final DeleteConversationUsecase deleteUsecase;
   final SearchUsersUsecase searchUsersUsecase;
   final GetMessagesByRecipientUsecase getMessagesByRecipientUsecase;
+  final SendPostMessageUsecase sendPostMessageUsecase;
 
   ChatBloc({
     required this.sendMessageUsecase,
@@ -35,6 +38,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     required this.deleteUsecase,
     required this.searchUsersUsecase,
     required this.getMessagesByRecipientUsecase,
+  required this.sendPostMessageUsecase,
   }) : super(ChatInitial()) {
     on<SendMessageRequested>(_onSendMessage);
     on<GetMessagesRequested>(_onGetMessages);
@@ -46,6 +50,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<SearchUsersRequested>(_onSearchUsers);
     on<GetMessagesByRecipientRequested>(_onGetMessagesByRecipient);
     on<PushNewMessageReceived>(_onPushNewMessageReceived);
+    on<SendPostMessageRequested>(_onSendPostMessage);
   }
 
   Future<void> _onSendMessage(
@@ -271,6 +276,45 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           e is NetworkException
               ? (e.message ?? 'Unexpected error')
               : 'Failed to process new message',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onSendPostMessage(
+    SendPostMessageRequested event,
+    Emitter<ChatState> emit,
+  ) async {
+    emit(SendingPostMessage());
+
+    try {
+      final result = await sendPostMessageUsecase.call(
+        recipientId: event.recipientId,
+        postId: event.postId,
+        conversationId: event.conversationId,
+      );
+
+      // Option 1: fire PushNewMessageReceived → recommended
+      final messageEntity = MessageEntity.fromJson(
+        result,
+      ); // you already have this
+      add(PushNewMessageReceived(messageEntity));
+
+      // Option 2: Emit success (for UI to pop modal)
+      emit(SendPostMessageSuccess());
+
+      // Optional: show toast
+      if (event.context.mounted) {
+        ScaffoldMessenger.of(event.context).showSnackBar(
+          const SnackBar(content: Text('Post shared successfully!')),
+        );
+      }
+    } catch (e) {
+      emit(
+        ChatError(
+          e is NetworkException
+              ? (e.message ?? 'Unexpected network error')
+              : 'Failed to share post',
         ),
       );
     }

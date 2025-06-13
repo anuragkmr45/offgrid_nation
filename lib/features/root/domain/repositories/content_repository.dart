@@ -18,4 +18,9 @@ abstract class ContentRepository {
     int limit,
     String? cursor,
   });
+  Future<Map<String, dynamic>> sendPostMessage({
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  });
 }

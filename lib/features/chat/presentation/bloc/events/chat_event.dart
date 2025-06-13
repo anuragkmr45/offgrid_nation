@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/features/chat/domain/entities/message_entity.dart';
 
 abstract class ChatEvent extends Equatable {
@@ -88,3 +89,22 @@ class PushNewMessageReceived extends ChatEvent {
   @override
   List<Object?> get props => [message];
 }
+
+class SendPostMessageRequested extends ChatEvent {
+  final String recipientId;
+  final String postId;
+  final String? conversationId;
+  final BuildContext context;
+
+  const SendPostMessageRequested({
+    required this.recipientId,
+    required this.postId,
+    this.conversationId,
+    required this.context,
+  });
+
+  @override
+  List<Object?> get props => [recipientId, postId, conversationId];
+}
+
+
