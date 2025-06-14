@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
@@ -65,7 +66,7 @@ class ChatListItem extends StatelessWidget {
         child: Row(
           children: [
             // Avatar
-            CircleAvatar(radius: 24, backgroundImage: NetworkImage(avatarUrl)),
+            CircleAvatar(radius: 24, backgroundImage: CachedNetworkImageProvider(avatarUrl)),
             const SizedBox(width: 12),
             // Name and last message column
             Expanded(

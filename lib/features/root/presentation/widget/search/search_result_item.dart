@@ -1,81 +1,4 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/cupertino.dart';
-
-// class SearchResultItem extends StatelessWidget {
-//   final String name;
-//   final String handle;
-//   final String avatarUrl;
-//   final VoidCallback onFollow;
-
-//   const SearchResultItem({
-//     super.key,
-//     required this.name,
-//     required this.handle,
-//     required this.avatarUrl,
-//     required this.onFollow,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
-
-//     final nameStyle =
-//         isIOS
-//             ? CupertinoTheme.of(context).textTheme.navTitleTextStyle.copyWith(
-//               fontSize: 17,
-//               fontWeight: FontWeight.w600,
-//             )
-//             : Theme.of(context).textTheme.titleMedium;
-
-//     final handleStyle =
-//         isIOS
-//             ? CupertinoTheme.of(
-//               context,
-//             ).textTheme.textStyle.copyWith(fontSize: 14, color: Colors.white70)
-//             : Theme.of(
-//               context,
-//             ).textTheme.bodySmall?.copyWith(color: Colors.white70);
-
-//     final followButton =
-//         isIOS
-//             ? CupertinoButton(
-//               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-//               color: Colors.white,
-//               onPressed: onFollow,
-//               child: const Text('FOLLOW', style: TextStyle(color: Colors.blue)),
-//             )
-//             : ElevatedButton(
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: Colors.white,
-//                 foregroundColor: Colors.blue,
-//               ),
-//               onPressed: onFollow,
-//               child: const Text('FOLLOW'),
-//             );
-
-//     return Container(
-//       color: Colors.blue,
-//       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-//       child: Row(
-//         children: [
-//           CircleAvatar(radius: 24, backgroundImage: NetworkImage(avatarUrl)),
-//           const SizedBox(width: 16),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(name, style: nameStyle),
-//                 const SizedBox(height: 4),
-//                 Text(handle, style: handleStyle),
-//               ],
-//             ),
-//           ),
-//           followButton,
-//         ],
-//       ),
-//     );
-//   }
-// }
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -175,7 +98,7 @@ class SearchResultItem extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundImage: NetworkImage(avatarUrl),
+                backgroundImage: CachedNetworkImageProvider(avatarUrl),
               ),
               const SizedBox(width: 16),
               Expanded(

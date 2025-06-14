@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -48,11 +49,12 @@ class _MediaCarouselState extends State<MediaCarousel> {
             width: isActive ? 12 : 6,
             height: 6,
             decoration: BoxDecoration(
-              color: isActive
-                  ? (Platform.isIOS
-                      ? CupertinoColors.activeBlue
-                      : Colors.blue)
-                  : Colors.grey,
+              color:
+                  isActive
+                      ? (Platform.isIOS
+                          ? CupertinoColors.activeBlue
+                          : Colors.blue)
+                      : Colors.grey,
               borderRadius: BorderRadius.circular(3),
             ),
           );
@@ -82,23 +84,27 @@ class _MediaCarouselState extends State<MediaCarousel> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(
-                        url,
+                      CachedNetworkImage(
+                        imageUrl: url,
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        errorBuilder: (context, _, __) =>
-                            const Center(child: Icon(Icons.broken_image, size: 40)),
+                        placeholder:
+                            (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                        errorWidget:
+                            (context, url, error) => const Center(
+                              child: Icon(Icons.broken_image, size: 40),
+                            ),
                       ),
                       if (isVideo(url))
                         Container(
                           color: Colors.black.withOpacity(0.3),
                           child: const Center(
-                            child: Icon(Icons.play_circle_fill, size: 64, color: Colors.white),
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              size: 64,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                     ],

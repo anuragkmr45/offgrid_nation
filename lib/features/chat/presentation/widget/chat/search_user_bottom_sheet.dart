@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,7 +81,7 @@ class _SearchUserBottomSheetState extends State<SearchUserBottomSheet> {
                           ),
                           leading: CircleAvatar(
                             radius: 24,
-                            backgroundImage: NetworkImage(user.profilePicture),
+                            backgroundImage: CachedNetworkImageProvider(user.profilePicture),
                           ),
                           title: Text(
                             '@${user.username}',

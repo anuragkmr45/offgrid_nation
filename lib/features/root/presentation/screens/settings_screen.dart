@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
@@ -110,8 +111,8 @@ class _SettingsPageState extends State<SettingsPage> {
         const SizedBox(height: 20),
         buildTile(
           icon: const CircleAvatar(
-            // backgroundImage: NetworkImage('https://i.pravatar.cc/300'),
-            backgroundImage: NetworkImage(
+            // backgroundImage: CachedNetworkImageProvider('https://i.pravatar.cc/300'),
+            backgroundImage: CachedNetworkImageProvider(
               'https://res.cloudinary.com/dtxm0dakw/image/upload/v1744723246/r3hsrs6dnpr53idcjtc5.png',
             ),
             radius: 20,

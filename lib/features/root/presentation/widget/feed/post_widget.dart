@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/widgets/media_carousel/media_carousel.dart';
@@ -130,7 +131,7 @@ class _PostWidgetState extends State<PostWidget> {
                   onTap: widget.onProfileTap,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage: NetworkImage(widget.userAvatarUrl),
+                    backgroundImage: CachedNetworkImageProvider(widget.userAvatarUrl),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -250,7 +251,7 @@ class _PostWidgetState extends State<PostWidget> {
                   onTap: widget.onProfileTap,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage: NetworkImage(widget.userAvatarUrl),
+                    backgroundImage: CachedNetworkImageProvider(widget.userAvatarUrl),
                   ),
                 ),
                 const SizedBox(width: 8),

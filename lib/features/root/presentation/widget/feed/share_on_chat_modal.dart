@@ -156,7 +156,7 @@ class _ShareOnChatModalState extends State<ShareOnChatModal> {
 //                         ),
 //                         leading: CircleAvatar(
 //                           radius: 24,
-//                           backgroundImage: NetworkImage(user.profilePicture),
+//                           backgroundImage: CachedNetworkImageProvider(user.profilePicture),
 //                         ),
 //                         title: Text(
 //                           '@${user.username}',

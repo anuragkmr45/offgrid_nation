@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/product_entity.dart';
@@ -74,7 +75,7 @@ class CreateListingModalContent extends StatelessWidget {
                         final ProductEntity product = products[i];
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: NetworkImage(product.images.first),
+                            backgroundImage: CachedNetworkImageProvider(product.images.first),
                           ),
                           title: Text(product.title),
                           subtitle: Text(product.price),
