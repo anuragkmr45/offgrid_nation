@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/widgets/media_carousel/media_carousel.dart';
 
@@ -67,10 +68,15 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(
-              child: Image.network(
-                widget.mediaUrls[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.mediaUrls[index],
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 60),
+                placeholder:
+                    (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                errorWidget:
+                    (_, __, ___) => const Icon(Icons.broken_image, size: 60),
               ),
             ),
           );

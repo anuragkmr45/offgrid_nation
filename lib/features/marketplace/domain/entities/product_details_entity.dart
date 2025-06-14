@@ -1,4 +1,3 @@
-// lib/features/marketplace/domain/entities/product_details_entity.dart
 import 'category_entity.dart';
 import 'owner_entity.dart';
 import 'location_entity.dart';
