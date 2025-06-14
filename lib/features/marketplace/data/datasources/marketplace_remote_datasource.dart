@@ -159,13 +159,12 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
         endpoint,
         headers: {'Authorization': 'Bearer $token'},
       );
-      print("--------------------------response---------------------: $response");
+      
       if (response == null || response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid product details response');
       }
       return response;
     } catch (e) {
-      print("--------------------------response---------------------: $e");
       throw NetworkException('Get product details failed: ${e.toString()}');
     }
   }
@@ -182,7 +181,7 @@ Future<List<dynamic>> listProducts({
   try {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-    
+    print("==================================================================================================================");
     final queryParams = {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),

@@ -148,7 +148,7 @@ class MarketplaceBloc extends Bloc<MarketplaceEvent, MarketplaceState> {
     FetchCategoriesRequested event,
     Emitter<MarketplaceState> emit,
   ) async {
-    emit(MarketplaceLoading());
+    // emit(MarketplaceLoading());
     try {
       final categories = await getCategoriesUseCase();
       emit(CategoriesLoaded(categories));

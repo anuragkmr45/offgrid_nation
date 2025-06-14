@@ -36,7 +36,7 @@ class FullScreenImageViewer extends StatefulWidget {
 
 class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   late PageController _controller;
-  int _currentPage = 0;
+  int currentPage = 0;
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       body: PageView.builder(
         controller: _controller,
         itemCount: widget.mediaUrls.length,
-        onPageChanged: (i) => setState(() => _currentPage = i),
+        onPageChanged: (i) => setState(() => currentPage = i),
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(

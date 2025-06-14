@@ -26,32 +26,33 @@ class CategoryButton extends StatelessWidget {
       listener: (context, state) {
         if (state is CategoriesLoaded) {
           Navigator.pop(context); // Close loading dialog
+
           Future.microtask(() async {
             final selectedCategory = await showModalBottomSheet<String?>(
               context: context,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
-              builder: (_) => CategorySelectionModal(
-                categories: state.categories,
-              ),
+              builder:
+                  (_) => CategorySelectionModal(categories: state.categories),
             );
 
-            // User dismissed modal without selecting
-            if (selectedCategory == null) return;
-
-            final screenState = context.findAncestorStateOfType<MarketplaceScreenState>();
+            final screenState =
+                context.findAncestorStateOfType<MarketplaceScreenState>();
             if (screenState != null) {
               // Show loading while fetching new results
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => const Center(child: CircularProgressIndicator()),
+                builder:
+                    (_) => const Center(child: CircularProgressIndicator()),
               );
 
+              // Always call setCategoryAndFetch even if null
               await screenState.setCategoryAndFetch(selectedCategory);
-
-              if (context.mounted) Navigator.pop(context); // Close loading dialog
             }
+
+            // ✅ Ensure loading is closed in all cases
+            if (context.mounted) Navigator.pop(context);
           });
         } else if (state is MarketplaceFailure) {
           Navigator.pop(context); // Close loading dialog
@@ -60,49 +61,50 @@ class CategoryButton extends StatelessWidget {
           );
         }
       },
-      child: Platform.isIOS
-          ? CupertinoButton(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(8),
-              onPressed: () {
-                context.read<MarketplaceBloc>().add(
-                      const FetchCategoriesRequested(),
-                    );
-                _showLoadingDialog(context);
-              },
-              child: _buildContent(CupertinoIcons.list_bullet),
-            )
-          : ElevatedButton.icon(
-              onPressed: () {
-                context.read<MarketplaceBloc>().add(
-                      const FetchCategoriesRequested(),
-                    );
-                _showLoadingDialog(context);
-              },
-              icon: Icon(
-                Icons.view_list,
-                size: 16,
-                color: AppColors.background,
-              ),
-              label: _buildTextLabel(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.background,
-                elevation: 0,
-                side: BorderSide(color: AppColors.background),
+      child:
+          Platform.isIOS
+              ? CupertinoButton(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 8,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(8),
+                onPressed: () {
+                  context.read<MarketplaceBloc>().add(
+                    const FetchCategoriesRequested(),
+                  );
+                  _showLoadingDialog(context);
+                },
+                child: _buildContent(CupertinoIcons.list_bullet),
+              )
+              : ElevatedButton.icon(
+                onPressed: () {
+                  context.read<MarketplaceBloc>().add(
+                    const FetchCategoriesRequested(),
+                  );
+                  _showLoadingDialog(context);
+                },
+                icon: Icon(
+                  Icons.view_list,
+                  size: 16,
+                  color: AppColors.background,
+                ),
+                label: _buildTextLabel(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.background,
+                  elevation: 0,
+                  side: BorderSide(color: AppColors.background),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-            ),
     );
   }
 
