@@ -9,7 +9,7 @@ import 'package:offgrid_nation_app/features/root/presentation/screens/home_scree
 import 'package:offgrid_nation_app/features/root/presentation/screens/search/search_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/add_post_screen.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/screens/messages_screen.dart';
-import 'package:offgrid_nation_app/features/root/presentation/screens/premium_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/screens/premium/premium_screen.dart';
 import 'package:offgrid_nation_app/injection_container.dart';
 
 class RootScreen extends StatefulWidget {

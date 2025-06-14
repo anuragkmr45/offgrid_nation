@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:offgrid_nation_app/core/network/api_client.dart';
 import 'package:offgrid_nation_app/core/constants/api_constants.dart';
 import 'package:offgrid_nation_app/core/session/auth_session.dart';
-import 'package:offgrid_nation_app/core/session/social_auth_session.dart';
+// import 'package:offgrid_nation_app/core/session/social_auth_session.dart';
 
 // auth
 import 'package:offgrid_nation_app/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -50,16 +50,19 @@ import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/market
 import 'package:offgrid_nation_app/features/root/data/datasources/add_post_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/content_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/notification_remote_datasource.dart';
+import 'package:offgrid_nation_app/features/root/data/datasources/premium_remote_data_source.dart';
 
 // profile
 import 'package:offgrid_nation_app/features/root/data/datasources/user_profile_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/add_post_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/content_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/notification_repository_impl.dart';
+import 'package:offgrid_nation_app/features/root/data/repositories/premium_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/user_profile_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/add_post_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/content_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/notification_repository.dart';
+import 'package:offgrid_nation_app/features/root/domain/repositories/premium_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/user_profile_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_comment_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_reply_usecase.dart';
@@ -72,6 +75,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/fetch_notifications_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/mark_notifications_read_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/posts/add_post_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/premium/create_checkout_session_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_blocked_users_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_follower_requests_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_followers_usecase.dart';
@@ -87,6 +91,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/up
 import 'package:offgrid_nation_app/features/root/presentation/bloc/add_post_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/premium_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 
 // search
@@ -122,7 +127,7 @@ Future<void> init() async {
     () => AuthSession(apiClient: sl<ApiClient>()),
   );
 
-  sl.registerLazySingleton<SocialAuthSession>(() => SocialAuthSession());
+  // sl.registerLazySingleton<SocialAuthSession>(() => SocialAuthSession());
 
   // ─────────────────────────────────────────────────────────────────────────────
   // ✅ Auth Feature
@@ -403,4 +408,17 @@ Future<void> init() async {
       sendPostMessageUsecase: sl(),
     ),
   );
+
+  // Premium Feature
+  sl.registerLazySingleton<PremiumRemoteDataSource>(
+    () => PremiumRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
+  );
+
+  sl.registerLazySingleton<PremiumRepository>(
+    () => PremiumRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => CreateCheckoutSessionUseCase(sl()));
+
+  sl.registerFactory(() => PremiumBloc(createCheckoutSessionUseCase: sl()));
 }
