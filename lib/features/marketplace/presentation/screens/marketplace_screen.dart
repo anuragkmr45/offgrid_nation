@@ -106,10 +106,12 @@ class MarketplaceScreenState extends State<MarketplaceScreen> {
   }
 
   Future<void> setCategoryAndFetch(String? categoryId) async {
-    print(
-      "++++++++++++++++++++++++++++categoryId+++++++++++++++++++++$categoryId",
-    );
-    if (categoryId == null || categoryId.isEmpty) return;
+    if (categoryId == null || categoryId.isEmpty) {
+      // Clear selected category and fetch default product list with location
+      _selectedCategoryId = null;
+      await _fetchProductsWithLocation(isInitial: true);
+      return;
+    }
 
     _selectedCategoryId = categoryId;
     await _fetchProductsWithLocation(isInitial: false);

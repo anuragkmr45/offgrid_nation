@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/widgets/media_carousel/media_carousel.dart';
 
@@ -35,7 +36,7 @@ class FullScreenImageViewer extends StatefulWidget {
 
 class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
   late PageController _controller;
-  int _currentPage = 0;
+  int currentPage = 0;
 
   @override
   void initState() {
@@ -63,14 +64,19 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
       body: PageView.builder(
         controller: _controller,
         itemCount: widget.mediaUrls.length,
-        onPageChanged: (i) => setState(() => _currentPage = i),
+        onPageChanged: (i) => setState(() => currentPage = i),
         itemBuilder: (context, index) {
           return InteractiveViewer(
             child: Center(
-              child: Image.network(
-                widget.mediaUrls[index],
+              child: CachedNetworkImage(
+                imageUrl: widget.mediaUrls[index],
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 60),
+                placeholder:
+                    (context, url) => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                errorWidget:
+                    (_, __, ___) => const Icon(Icons.broken_image, size: 60),
               ),
             ),
           );

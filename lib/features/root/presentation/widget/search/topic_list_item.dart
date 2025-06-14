@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
@@ -40,19 +41,25 @@ class TopicListItem extends StatelessWidget {
           // Image on the right, clipped with a rounded rectangle
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              imageUrl,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
               width: 100,
               height: 60,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 100,
-                  height: 60,
-                  color: Colors.grey,
-                  child: const Icon(Icons.broken_image, color: Colors.white),
-                );
-              },
+              placeholder:
+                  (context, url) => Container(
+                    width: 100,
+                    height: 60,
+                    color: Colors.grey[300],
+                    child: const CupertinoActivityIndicator(),
+                  ),
+              errorWidget:
+                  (context, url, error) => Container(
+                    width: 100,
+                    height: 60,
+                    color: Colors.grey,
+                    child: const Icon(Icons.broken_image, color: Colors.white),
+                  ),
             ),
           ),
         ],

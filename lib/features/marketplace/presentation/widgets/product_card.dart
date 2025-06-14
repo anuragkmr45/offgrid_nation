@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
 
@@ -42,24 +43,20 @@ class ProductCard extends StatelessWidget {
                 aspectRatio: 1,
                 child:
                     image.startsWith('http')
-                        ? Image.network(
-                          image,
+                        ? CachedNetworkImage(
+                          imageUrl: image,
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          errorBuilder:
-                              (_, __, ___) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: 40,
-                                  color: Colors.grey,
+                          placeholder:
+                              (context, url) => const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                 ),
                               ),
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            );
-                          },
+                          errorWidget:
+                              (context, url, error) => const Center(
+                                child: Icon(Icons.broken_image, size: 40),
+                              ),
                         )
                         : Image.asset(
                           image,
@@ -76,7 +73,7 @@ class ProductCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        price,
+                        '\$ $price',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: Platform.isIOS ? 13.5 : 14,

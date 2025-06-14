@@ -43,16 +43,18 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
     int limit = 20,
     String? cursor,
   }) async {
-    final token = await authSession.getSessionToken();
+    try {
+      final token = await authSession.getSessionToken();
     if (token == null) {
       throw const NetworkException('Not authorized');
     }
-
+print("--------------------------------------$token");
     final safeLimit = limit > 5 ? 5 : limit;
     final query = {
       'limit': safeLimit.toString(),
       if (cursor != null) 'cursor': cursor,
     };
+print("---------------------------query -----------$query");
 
     final response = await apiClient.get(
       ApiConstants.fetchfeedEndpoint,
@@ -60,10 +62,15 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
       queryParams: query,
     );
 
+print("--------------------------response-----------$response");
     if (response is! Map<String, dynamic>) {
       throw const NetworkException('Invalid feed response format');
     }
     return response;
+    } catch (e) {
+print("--------------------------response-----------$e");
+      throw NetworkException('Failed to search users: $e');
+    }
   }
 
   @override

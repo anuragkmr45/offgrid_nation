@@ -181,7 +181,7 @@ Future<List<dynamic>> listProducts({
   try {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-    
+    print("==================================================================================================================");
     final queryParams = {
       'latitude': latitude.toString(),
       'longitude': longitude.toString(),
