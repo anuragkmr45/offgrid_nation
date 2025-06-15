@@ -2,7 +2,10 @@ import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/widget/feed/share_on_chat_modal.dart';
+import 'package:offgrid_nation_app/injection_container.dart' as di;
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 // import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
@@ -15,6 +18,7 @@ import 'package:offgrid_nation_app/core/widgets/custom_modal.dart';
 class ShareHelper {
   static void showShareOptions(
     BuildContext context, {
+    required String postId,
     required String content,
     required List<String> mediaUrls,
   }) {
@@ -29,7 +33,7 @@ class ShareHelper {
                 CupertinoActionSheetAction(
                   onPressed: () {
                     Navigator.pop(context);
-                    _showShareOnChatModal(context);
+                    _showShareOnChatModal(context, postId);
                   },
                   child: const Text('Share on Chat'),
                 ),
@@ -69,7 +73,7 @@ class ShareHelper {
                   title: const Text('Share on Chat'),
                   onTap: () {
                     Navigator.pop(context);
-                    _showShareOnChatModal(context);
+                    _showShareOnChatModal(context, postId);
                   },
                 ),
                 ListTile(
@@ -96,11 +100,14 @@ class ShareHelper {
     }
   }
 
-  static void _showShareOnChatModal(BuildContext context) {
+  static void _showShareOnChatModal(BuildContext context, String postId) {
     CustomModal.show(
       context: context,
       title: 'Share on Chat',
-      content: ShareOnChatModal(),
+      content: BlocProvider<ContentBloc>(
+        create: (_) => di.sl<ContentBloc>(),
+        child: ShareOnChatModal(postId: postId),
+      ),
     );
   }
 

@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:offgrid_nation_app/core/errors/error_handler.dart';
 import 'package:offgrid_nation_app/core/session/auth_session.dart';
+import 'package:offgrid_nation_app/features/chat/domain/entities/chat_user_entity.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/search_users_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/entities/comment_model.dart';
 import 'package:offgrid_nation_app/features/root/domain/entities/content_modal.dart';
 import 'package:offgrid_nation_app/features/root/domain/entities/reply_model.dart';
@@ -13,6 +15,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_rep
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/content_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_comments_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_replies_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/content/send_post_message_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_comment_like_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_like_dislike_usecase.dart';
 
@@ -28,6 +31,8 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
   final ToggleCommentLikeUsecase toggleCommentLikeUsecase;
   final FetchRepliesUsecase fetchRepliesUsecase;
   final AddReplyUsecase addReplyUsecase;
+  final SearchUsersUsecase searchUsersUsecase;
+  final SendPostMessageUsecase sendPostMessageUsecase;
 
   ContentBloc({
     required this.fetchUsecase,
@@ -38,6 +43,8 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     required this.toggleCommentLikeUsecase,
     required this.fetchRepliesUsecase,
     required this.addReplyUsecase,
+    required this.searchUsersUsecase,
+    required this.sendPostMessageUsecase,
   }) : super(const ContentState()) {
     on<FetchContentRequested>(_onFetch);
     on<FetchMoreContentRequested>(_onFetchMore);
@@ -47,6 +54,8 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     on<ToggleCommentLikeRequested>(_onToggleCommentLike);
     on<FetchRepliesRequested>(_onFetchReplies);
     on<AddReplyRequested>(_onAddReply);
+    on<SearchUsersRequested>(_onSearchUsers);
+    on<SharePostRequested>(_onSharePost);
   }
 
   Future<void> _onFetch(
@@ -274,21 +283,6 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
     }
   }
 
-  // Future<void> _onAddReply(
-  //   AddReplyRequested event,
-  //   Emitter<ContentState> emit,
-  // ) async {
-  //   try {
-  //     final reply = await addReplyUsecase(
-  //       commentId: event.commentId,
-  //       content: event.content,
-  //     );
-  //     final updated = [...?state.replies, reply];
-  //     emit(state.copyWith(replies: updated));
-  //   } catch (e) {
-  //     _showPlatformError(event.context, e);
-  //   }
-  // }
   Future<void> _onAddReply(
     AddReplyRequested event,
     Emitter<ContentState> emit,
@@ -331,6 +325,44 @@ class ContentBloc extends Bloc<ContentEvent, ContentState> {
         ..removeWhere((r) => r.id == tempId);
       emit(state.copyWith(replies: rollbackReplies));
 
+      _showPlatformError(event.context, e);
+    }
+  }
+
+  Future<void> _onSearchUsers(
+    SearchUsersRequested event,
+    Emitter<ContentState> emit,
+  ) async {
+    if (event.query.trim().isEmpty) {
+      emit(state.copyWith(searchResults: []));
+      return;
+    }
+
+    try {
+      final results = await searchUsersUsecase(event.query);
+      emit(state.copyWith(searchResults: results));
+    } catch (e) {
+      emit(state.copyWith(searchResults: [])); // Fail silently
+    }
+  }
+
+  Future<void> _onSharePost(
+    SharePostRequested event,
+    Emitter<ContentState> emit,
+  ) async {
+    try {
+      await sendPostMessageUsecase.call(
+        recipientId: event.recipientId,
+        postId: event.postId,
+        conversationId: event.conversationId,
+      );
+
+      if (event.context.mounted) {
+        ScaffoldMessenger.of(event.context).showSnackBar(
+          const SnackBar(content: Text('Post shared successfully!')),
+        );
+      }
+    } catch (e) {
       _showPlatformError(event.context, e);
     }
   }

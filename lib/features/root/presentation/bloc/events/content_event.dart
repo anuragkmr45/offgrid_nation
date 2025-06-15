@@ -90,3 +90,28 @@ class AddReplyRequested extends ContentEvent {
   @override
   List<Object?> get props => [commentId, content];
 }
+
+class SearchUsersRequested extends ContentEvent {
+  final String query;
+  const SearchUsersRequested(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+class SharePostRequested extends ContentEvent {
+  final BuildContext context;
+  final String postId;
+  final String recipientId;
+  final String? conversationId;
+
+  const SharePostRequested({
+    required this.context,
+    required this.postId,
+    required this.recipientId,
+    this.conversationId,
+  });
+
+  @override
+  List<Object?> get props => [context, postId, recipientId, conversationId];
+}

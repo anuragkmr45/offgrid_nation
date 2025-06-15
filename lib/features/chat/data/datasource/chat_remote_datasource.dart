@@ -22,11 +22,10 @@ abstract class ChatRemoteDataSource {
     String? cursor,
   });
   Future<Map<String, dynamic>> sendPostMessage({
-  required String recipientId,
-  required String postId,
-  String? conversationId,
-});
-
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  });
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -189,13 +188,17 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   Future<List<ChatUserEntity>> searchUsers(String query) async {
     final token = await authSession.getSessionToken();
     if (token == null) throw const NetworkException('Unauthorized');
-
+    print(
+      "+++++++++++++++++++++++++++++ search user api call ++++++++++++++++++++",
+    );
     final url = ChatApiConstants.searchUsers(query);
     final response = await apiClient.get(
       url,
       headers: {'Authorization': 'Bearer $token'},
     );
-print("++++++++++++++++++++++++++++++++++++response+++++++++++++++++ $response");
+    print(
+      "++++++++++++++++++++++++++chat ++++++++++response+++++++++++++++++ $response",
+    );
     if (response is! List) {
       throw const NetworkException('Invalid user search response');
     }
@@ -204,34 +207,33 @@ print("++++++++++++++++++++++++++++++++++++response+++++++++++++++++ $response")
   }
 
   @override
-Future<Map<String, dynamic>> sendPostMessage({
-  required String recipientId,
-  required String postId,
-  String? conversationId,
-}) async {
-  final token = await authSession.getSessionToken();
-  if (token == null) {
-    throw const NetworkException('Not authorized');
+  Future<Map<String, dynamic>> sendPostMessage({
+    required String recipientId,
+    required String postId,
+    String? conversationId,
+  }) async {
+    final token = await authSession.getSessionToken();
+    if (token == null) {
+      throw const NetworkException('Not authorized');
+    }
+
+    final body = {
+      'recipient': recipientId,
+      'actionType': 'post',
+      'postId': postId,
+      if (conversationId != null) 'conversationId': conversationId,
+    };
+
+    final response = await apiClient.post(
+      ChatApiConstants.sendMessage,
+      headers: {'Authorization': 'Bearer $token'},
+      body: body,
+    );
+
+    if (response is! Map<String, dynamic>) {
+      throw const NetworkException('Invalid send message response');
+    }
+
+    return response;
   }
-
-  final body = {
-    'recipient': recipientId,
-    'actionType': 'post',
-    'postId': postId,
-    if (conversationId != null) 'conversationId': conversationId,
-  };
-
-  final response = await apiClient.post(
-    ChatApiConstants.sendMessage,
-    headers: {'Authorization': 'Bearer $token'},
-    body: body,
-  );
-
-  if (response is! Map<String, dynamic>) {
-    throw const NetworkException('Invalid send message response');
-  }
-
-  return response;
-}
-
 }

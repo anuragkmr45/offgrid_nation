@@ -10,6 +10,7 @@ class ContentState extends Equatable {
   final List<CommentModel>? comments;
   final List<ReplyModel>? replies;
   final String? errorMessage;
+  final List<ChatUserEntity>? searchResults;
 
   const ContentState({
     this.status = ContentStatus.initial,
@@ -18,7 +19,8 @@ class ContentState extends Equatable {
     this.hasMore = true,
     this.comments,
     this.replies,
-    this.errorMessage,
+    this.errorMessage, 
+    this.searchResults, 
   });
 
   ContentState copyWith({
@@ -29,6 +31,7 @@ class ContentState extends Equatable {
     List<CommentModel>? comments,
     List<ReplyModel>? replies,
     String? errorMessage,
+  List<ChatUserEntity>? searchResults,
   }) {
     return ContentState(
       status: status ?? this.status,
@@ -38,6 +41,7 @@ class ContentState extends Equatable {
       comments: comments ?? this.comments,
       replies: replies ?? this.replies,
       errorMessage: errorMessage ?? this.errorMessage,
+      searchResults: searchResults ?? this.searchResults,
     );
   }
 
@@ -50,5 +54,6 @@ class ContentState extends Equatable {
     comments,
     replies,
     errorMessage,
+    searchResults
   ];
 }

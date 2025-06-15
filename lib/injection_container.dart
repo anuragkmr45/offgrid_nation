@@ -264,40 +264,6 @@ Future<void> init() async {
   sl.registerFactory(() => SearchUserBloc(fetchSearchUsersUsecase: sl()));
 
   // ─────────────────────────────────────────────────────────────────
-  // feed
-  // ─────────────────────────────────────────────────────────────────
-  sl.registerLazySingleton<ContentRemoteDataSource>(
-    () => ContentRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
-  );
-
-  sl.registerLazySingleton<ContentRepository>(
-    () => ContentRepositoryImpl(sl()),
-  );
-
-  sl.registerLazySingleton(() => FetchContentUsecase(sl()));
-
-  // Use Cases
-  sl.registerLazySingleton(() => ToggleLikeDislikeUsecase(sl()));
-  sl.registerLazySingleton(() => FetchCommentsUsecase(sl()));
-  sl.registerLazySingleton(() => AddCommentUsecase(sl()));
-  sl.registerLazySingleton(() => ToggleCommentLikeUsecase(sl()));
-  sl.registerLazySingleton(() => FetchRepliesUsecase(sl()));
-  sl.registerLazySingleton(() => AddReplyUsecase(sl()));
-
-  sl.registerFactory(
-    () => ContentBloc(
-      fetchUsecase: sl(),
-      toggleLikeDislikeUsecase: sl(),
-      authSession: sl(),
-      fetchCommentsUsecase: sl(),
-      addCommentUsecase: sl(),
-      toggleCommentLikeUsecase: sl(),
-      fetchRepliesUsecase: sl(),
-      addReplyUsecase: sl(),
-    ),
-  );
-
-  // ─────────────────────────────────────────────────────────────────
   // add post
   // ─────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<AddPostRemoteDataSource>(
@@ -406,11 +372,49 @@ Future<void> init() async {
       deleteUsecase: sl(),
       searchUsersUsecase: sl(),
       getMessagesByRecipientUsecase: sl(),
+      // sendPostMessageUsecase: sl(),
+    ),
+  );
+
+  // ─────────────────────────────────────────────────────────────────
+  // feed
+  // ─────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<ContentRemoteDataSource>(
+    () => ContentRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
+  );
+
+  sl.registerLazySingleton<ContentRepository>(
+    () => ContentRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => FetchContentUsecase(sl()));
+
+  // Use Cases
+  sl.registerLazySingleton(() => ToggleLikeDislikeUsecase(sl()));
+  sl.registerLazySingleton(() => FetchCommentsUsecase(sl()));
+  sl.registerLazySingleton(() => AddCommentUsecase(sl()));
+  sl.registerLazySingleton(() => ToggleCommentLikeUsecase(sl()));
+  sl.registerLazySingleton(() => FetchRepliesUsecase(sl()));
+  sl.registerLazySingleton(() => AddReplyUsecase(sl()));
+
+  sl.registerFactory(
+    () => ContentBloc(
+      fetchUsecase: sl(),
+      toggleLikeDislikeUsecase: sl(),
+      authSession: sl(),
+      fetchCommentsUsecase: sl(),
+      addCommentUsecase: sl(),
+      toggleCommentLikeUsecase: sl(),
+      fetchRepliesUsecase: sl(),
+      addReplyUsecase: sl(),
+      searchUsersUsecase: sl(),
       sendPostMessageUsecase: sl(),
     ),
   );
 
+  // ─────────────────────────────────────────────────────────────────
   // Premium Feature
+  // ─────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<PremiumRemoteDataSource>(
     () => PremiumRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
   );
