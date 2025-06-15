@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:offgrid_nation_app/core/widgets/wrapper/root_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:offgrid_nation_app/core/navigation/global_navigator.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/events/premium_event.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/premium_bloc.dart';
 
 class CheckoutSuccessScreen extends StatelessWidget {
   const CheckoutSuccessScreen({super.key});
@@ -30,11 +32,16 @@ class CheckoutSuccessScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () => Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const RootScreen()),
-                (route) => false,
-              ),
+              onPressed: () {
+                final bloc = context.read<PremiumBloc>();
+                bloc.add(FetchPremiumFeedRequested());
+
+                navigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  '/home',
+                  (route) => false,
+                  arguments: {'initialTab': 4},
+                );
+              },
               child: const Text('Continue'),
             ),
           ],

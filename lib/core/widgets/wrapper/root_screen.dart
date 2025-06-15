@@ -4,6 +4,7 @@ import 'package:offgrid_nation_app/core/widgets/wrapper/main_wrapper.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/events/premium_event.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/premium_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/search_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/home_screen.dart';
@@ -14,21 +15,33 @@ import 'package:offgrid_nation_app/features/root/presentation/screens/premium/pr
 import 'package:offgrid_nation_app/injection_container.dart';
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({super.key});
+  final int initialTab;
+  const RootScreen({super.key, this.initialTab = 0});
 
   @override
-  _RootScreenState createState() => _RootScreenState();
+  State<RootScreen> createState() => _RootScreenState();
 }
 
 class _RootScreenState extends State<RootScreen> {
-  int _currentTabIndex = 0;
+  // int _currentTabIndex = 0;
+  late int _currentTabIndex = widget.initialTab;
 
   late final List<bool> _isTabBuilt = List.filled(5, false);
 
   @override
   void initState() {
     super.initState();
-    _isTabBuilt[0] = true; // First tab should build initially
+    _isTabBuilt[0] = true; // Home tab should always build first
+
+    // ✅ If deep-linked to premium tab, trigger fetch once
+    if (widget.initialTab == 4) {
+      _isTabBuilt[4] = true;
+
+      Future.microtask(() {
+        final premiumBloc = sl<PremiumBloc>();
+        premiumBloc.add(FetchPremiumFeedRequested());
+      });
+    }
   }
 
   void _onTabSelected(int index) {

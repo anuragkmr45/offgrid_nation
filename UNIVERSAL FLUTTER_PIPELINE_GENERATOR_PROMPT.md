@@ -89,3 +89,34 @@ permissionsd
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
                  android:maxSdkVersion="28"/>
+
+
+                 
+<intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https"
+          android:host="offgrid.app"
+          android:pathPrefix="/stripe" />
+</intent-filter>
+
+Configure iOS
+In ios/Runner/Info.plist, add:
+
+xml
+Copy
+Edit
+<key>CFBundleURLTypes</key>
+<array>
+  <dict>
+    <key>CFBundleURLSchemes</key>
+    <array>
+      <string>https</string>
+    </array>
+  </dict>
+</array>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>https</string>
+</array>

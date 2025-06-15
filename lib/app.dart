@@ -6,6 +6,7 @@ import 'package:offgrid_nation_app/features/marketplace/presentation/screens/pro
 import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/notification/notification_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/screens/premium/payment_failure_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/privacy_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/user_profile/profile_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/settings_screen.dart';
@@ -140,7 +141,13 @@ class App extends StatelessWidget {
                 create: (_) => di.sl<ResetPasswordBloc>(),
                 child: const ResetPasswordScreen(),
               ),
-          '/home': (context) => const RootScreen(),
+          '/home': (context) {
+            final args =
+                ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>?;
+            final initialTab = args?['initialTab'] ?? 0;
+            return RootScreen(initialTab: initialTab);
+          },
           '/conversation': (context) {
             final args =
                 ModalRoute.of(context)!.settings.arguments
@@ -191,6 +198,7 @@ class App extends StatelessWidget {
                 create: (_) => di.sl<NotificationBloc>(),
                 child: const NotificationScreen(),
               ),
+          '/payment-failed': (_) => const CheckoutFailureScreen(),
         },
       );
     }
