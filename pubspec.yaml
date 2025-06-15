@@ -90,7 +90,7 @@ flutter:
   # like this:
   assets:
     - lib/assets/images/
-    - lib/assets/data/
+    # - lib/assets/data/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

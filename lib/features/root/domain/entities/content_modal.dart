@@ -78,7 +78,7 @@ class ContentModel {
       location: location,
       isLiked: isLiked ?? this.isLiked,
       commentsCount: commentsCount ?? this.commentsCount,
-      likesCount: likesCount ?? this.likesCount, // ✅ fix
+      likesCount: likesCount ?? this.likesCount,
       createdAt: createdAt,
     );
   }

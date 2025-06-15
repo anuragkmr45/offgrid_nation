@@ -8,3 +8,5 @@ abstract class PremiumEvent extends Equatable {
 }
 
 class CreateCheckoutSessionRequested extends PremiumEvent {}
+
+class FetchPremiumFeedRequested extends PremiumEvent {}

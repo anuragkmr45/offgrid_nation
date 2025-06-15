@@ -73,4 +73,5 @@ class ApiConstants {
 
   // premium
   static const String createCheckoutSessionEndpoint = "/user/payments/create-session";
+  static const String fetchPremiumFeedEndpoint = "/feed/premium";
 }

@@ -4,6 +4,7 @@ import 'package:offgrid_nation_app/core/widgets/wrapper/main_wrapper.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/premium_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/search_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/home_screen.dart';
 import 'package:offgrid_nation_app/features/root/presentation/screens/search/search_screen.dart';
@@ -66,9 +67,12 @@ class _RootScreenState extends State<RootScreen> {
           child: const MessagesScreen(),
         );
       case 4:
-        return const PremiumScreen();
+        return BlocProvider<PremiumBloc>(
+          create: (_) => sl<PremiumBloc>(),
+          child: const PremiumScreen(),
+        );
       default:
-        return const SizedBox.shrink(); // Always safe fallback
+        return const SizedBox.shrink();
     }
   }
 
@@ -77,6 +81,7 @@ class _RootScreenState extends State<RootScreen> {
     return MainWrapper(
       currentTabIndex: _currentTabIndex,
       onTabSelected: _onTabSelected,
+      isPremium: _currentTabIndex == 4,
       child: Stack(
         children: List.generate(5, (index) {
           return Offstage(

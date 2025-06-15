@@ -2,9 +2,11 @@ import 'package:offgrid_nation_app/core/constants/api_constants.dart';
 import 'package:offgrid_nation_app/core/network/api_client.dart';
 import 'package:offgrid_nation_app/core/session/auth_session.dart';
 import 'package:offgrid_nation_app/core/errors/network_exception.dart';
+import 'package:offgrid_nation_app/features/root/domain/entities/premium/premium_feed_response_model.dart';
 
 abstract class PremiumRemoteDataSource {
   Future<String> createCheckoutSession();
+  Future<PremiumFeedResponseModel> fetchPremiumFeed();
 }
 
 class PremiumRemoteDataSourceImpl implements PremiumRemoteDataSource {
@@ -27,7 +29,7 @@ class PremiumRemoteDataSourceImpl implements PremiumRemoteDataSource {
         headers: {'Authorization': 'Bearer $token'},
         body: {},
       );
-      
+
       if (res == null || res['url'] == null) {
         throw const NetworkException('Invalid checkout session response');
       }
@@ -36,5 +38,18 @@ class PremiumRemoteDataSourceImpl implements PremiumRemoteDataSource {
     } catch (e) {
       throw NetworkException('Create checkout session failed: ${e.toString()}');
     }
+  }
+
+  @override
+  Future<PremiumFeedResponseModel> fetchPremiumFeed() async {
+    final token = await authSession.getSessionToken();
+    if (token == null) throw const NetworkException('Not authorized');
+
+    final res = await apiClient.get(
+      ApiConstants.fetchPremiumFeedEndpoint,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+print("-------------res------------: $res");
+    return PremiumFeedResponseModel.fromJson(res);
   }
 }

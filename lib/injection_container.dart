@@ -76,6 +76,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/notification/fe
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/mark_notifications_read_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/posts/add_post_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/premium/create_checkout_session_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/premium/fetch_premium_feed_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_blocked_users_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_follower_requests_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_followers_usecase.dart';
@@ -418,7 +419,14 @@ Future<void> init() async {
     () => PremiumRepositoryImpl(sl()),
   );
 
+  sl.registerLazySingleton(() => FetchPremiumFeedUseCase(sl()));
+
   sl.registerLazySingleton(() => CreateCheckoutSessionUseCase(sl()));
 
-  sl.registerFactory(() => PremiumBloc(createCheckoutSessionUseCase: sl()));
+  sl.registerFactory(
+    () => PremiumBloc(
+      createCheckoutSessionUseCase: sl(),
+      fetchPremiumFeedUseCase: sl(),
+    ),
+  );
 }
