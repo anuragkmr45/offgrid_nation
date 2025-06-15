@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:offgrid_nation_app/features/root/domain/entities/comment_model.dart';
 import 'package:offgrid_nation_app/features/root/domain/entities/premium/post_entity.dart';
 
 abstract class PremiumState extends Equatable {
@@ -51,3 +52,11 @@ class PremiumFeedFailure extends PremiumState {
 }
 
 class PremiumUserNotSubscribed extends PremiumState {}
+
+class PremiumCommentsLoaded extends PremiumState {
+  final List<CommentModel> comments;
+  const PremiumCommentsLoaded(this.comments);
+
+  @override
+  List<Object?> get props => [comments];
+}

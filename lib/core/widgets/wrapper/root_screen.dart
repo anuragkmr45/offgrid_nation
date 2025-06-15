@@ -67,8 +67,11 @@ class _RootScreenState extends State<RootScreen> {
           child: const MessagesScreen(),
         );
       case 4:
-        return BlocProvider<PremiumBloc>(
-          create: (_) => sl<PremiumBloc>(),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<PremiumBloc>(create: (_) => sl<PremiumBloc>()),
+            BlocProvider<ContentBloc>(create: (_) => sl<ContentBloc>()),
+          ],
           child: const PremiumScreen(),
         );
       default:

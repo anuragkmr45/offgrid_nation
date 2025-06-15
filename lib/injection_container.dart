@@ -427,6 +427,10 @@ Future<void> init() async {
     () => PremiumBloc(
       createCheckoutSessionUseCase: sl(),
       fetchPremiumFeedUseCase: sl(),
+      toggleLikeDislikeUsecase: sl(),
+      addReplyUseCase: sl(),
+      addCommentUseCase: sl(),
+      fetchCommentsUseCase: sl(),
     ),
   );
 }

@@ -31,4 +31,25 @@ class PostEntity {
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
+
+  PostEntity copyWith({
+    List<String>? media,
+    String? content,
+    int? commentsCount,
+    int? likesCount,
+    bool? isLiked,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return PostEntity(
+      id: id,
+      media: media ?? this.media,
+      content: content ?? this.content,
+      commentsCount: commentsCount ?? this.commentsCount,
+      likesCount: likesCount ?? this.likesCount,
+      isLiked: isLiked ?? this.isLiked,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
