@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -175,7 +176,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundImage: NetworkImage(user["profilePicture"] ?? ""),
+            backgroundImage: CachedNetworkImageProvider(user["profilePicture"] ?? ""),
           ),
           const SizedBox(width: 12),
           Expanded(

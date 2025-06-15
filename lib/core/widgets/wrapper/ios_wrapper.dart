@@ -6,12 +6,14 @@ class IOSWrapper extends StatefulWidget {
   final Widget child;
   final int currentTabIndex;
   final ValueChanged<int>? onTabSelected;
+  final bool isPremium;
 
   const IOSWrapper({
     super.key,
     required this.child,
     this.currentTabIndex = 0,
     this.onTabSelected,
+    this.isPremium = false,
   });
 
   @override
@@ -107,7 +109,10 @@ class _IOSWrapperState extends State<IOSWrapper>
           ),
         ],
       ),
-      backgroundColor: Colors.white.withOpacity(0.9),
+      backgroundColor:
+          widget.isPremium
+              ? const Color(0xFFFbbc06)
+              : Colors.white.withOpacity(0.9),
     );
   }
 

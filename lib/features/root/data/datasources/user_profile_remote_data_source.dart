@@ -75,6 +75,7 @@ class UserProfileRemoteDataSourceImpl implements UserProfileRemoteDataSource {
           ApiConstants.viewUserEndpoint
               .replaceFirst(':username', userId)
               .toString();
+              
       final response = await apiClient.get(
         endpoint,
         headers: {'Authorization': 'Bearer $token'},

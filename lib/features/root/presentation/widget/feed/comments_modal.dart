@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -159,7 +160,7 @@ class _CommentModalState extends State<CommentModal> {
                       children: [
                         CircleAvatar(
                           radius: 14,
-                          backgroundImage: NetworkImage(
+                          backgroundImage: CachedNetworkImageProvider(
                             reply.user.profilePicture,
                           ),
                         ),
@@ -300,7 +301,7 @@ class _CommentModalState extends State<CommentModal> {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundImage: NetworkImage(comment.user.profilePicture),
+            backgroundImage: CachedNetworkImageProvider(comment.user.profilePicture),
           ),
           const SizedBox(width: 12),
           Expanded(

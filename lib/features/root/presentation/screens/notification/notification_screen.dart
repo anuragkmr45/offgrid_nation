@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/root/domain/entities/notification_entity.dart';
@@ -63,7 +64,7 @@ class NotificationScreen extends StatelessWidget {
     return ListTile(
       leading: entity.profilePicture != null && entity.profilePicture!.isNotEmpty
           ? CircleAvatar(
-              backgroundImage: NetworkImage(entity.profilePicture!),
+              backgroundImage: CachedNetworkImageProvider(entity.profilePicture!),
             )
           : const CircleAvatar(backgroundColor: Colors.blue, radius: 20),
       title: Text(

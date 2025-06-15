@@ -1,105 +1,16 @@
-// import 'dart:io' show Platform;
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-
-// class ShareHelper {
-//   static void showShareOptions(BuildContext context) {
-//     if (Platform.isIOS) {
-//       showCupertinoModalPopup(
-//         context: context,
-//         builder:
-//             (context) => CupertinoActionSheet(
-//               title: const Text('Share Post'),
-//               message: const Text('Choose a share option'),
-//               actions: [
-//                 CupertinoActionSheetAction(
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                     // TODO: Implement share logic for Instagram
-//                   },
-//                   child: const Text('Share to Instagram'),
-//                 ),
-//                 CupertinoActionSheetAction(
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                     // TODO: Implement share logic for Facebook
-//                   },
-//                   child: const Text('Share to Facebook'),
-//                 ),
-//                 CupertinoActionSheetAction(
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                   },
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       const Icon(CupertinoIcons.link),
-//                       const SizedBox(width: 8),
-//                       const Text('Copy Link'),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//               cancelButton: CupertinoActionSheetAction(
-//                 onPressed: () => Navigator.pop(context),
-//                 child: const Text('Cancel'),
-//               ),
-//             ),
-//       );
-//     } else {
-//       showModalBottomSheet(
-//         context: context,
-//         shape: const RoundedRectangleBorder(
-//           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-//         ),
-//         builder: (context) {
-//           return Container(
-//             padding: const EdgeInsets.all(16),
-//             height: 250,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 const Text(
-//                   'Share Post',
-//                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-//                 ),
-//                 const SizedBox(height: 12),
-//                 ListTile(
-//                   leading: const Icon(Icons.share),
-//                   title: const Text('Share to Instagram'),
-//                   onTap: () {
-//                     Navigator.pop(context);
-//                     // TODO: Implement share logic for Instagram
-//                   },
-//                 ),
-//                 ListTile(
-//                   leading: const Icon(Icons.facebook),
-//                   title: const Text('Share to Facebook'),
-//                   onTap: () {
-//                     Navigator.pop(context);
-//                     // TODO: Implement share logic for Facebook
-//                   },
-//                 ),
-//                 ListTile(
-//                   leading: const Icon(Icons.link),
-//                   title: const Text('Copy Link'),
-//                   onTap: () {
-//                     Navigator.pop(context);
-//                     // TODO: Implement share logic for Copy Link
-//                   },
-//                 ),
-//               ],
-//             ),
-//           );
-//         },
-//       );
-//     }
-//   }
 import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:offgrid_nation_app/features/root/presentation/widget/feed/share_on_chat_modal.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
+// import 'package:offgrid_nation_app/features/chat/presentation/bloc/events/chat_event.dart';
+// import 'package:offgrid_nation_app/features/chat/presentation/bloc/states/chat_state.dart';
 import 'package:share_plus/share_plus.dart';
+// import 'package:offgrid_nation_app/core/widgets/custom_search_bar.dart';
+import 'package:offgrid_nation_app/core/widgets/custom_modal.dart';
+// import 'package:offgrid_nation_app/core/utils/debouncer.dart';
 
 class ShareHelper {
   static void showShareOptions(
@@ -115,6 +26,13 @@ class ShareHelper {
               title: const Text('Share Post'),
               message: const Text('Choose a share option'),
               actions: [
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showShareOnChatModal(context);
+                  },
+                  child: const Text('Share on Chat'),
+                ),
                 CupertinoActionSheetAction(
                   onPressed: () {
                     Navigator.pop(context);
@@ -147,6 +65,14 @@ class ShareHelper {
             child: Wrap(
               children: [
                 ListTile(
+                  leading: const Icon(Icons.chat),
+                  title: const Text('Share on Chat'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showShareOnChatModal(context);
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.share),
                   title: const Text('Share via Apps'),
                   onTap: () {
@@ -168,6 +94,14 @@ class ShareHelper {
         },
       );
     }
+  }
+
+  static void _showShareOnChatModal(BuildContext context) {
+    CustomModal.show(
+      context: context,
+      title: 'Share on Chat',
+      content: ShareOnChatModal(),
+    );
   }
 
   static void _shareToAll(String content, List<String> mediaUrls) {

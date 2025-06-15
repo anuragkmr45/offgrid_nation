@@ -1,4 +1,5 @@
 // lib/features/marketplace/presentation/widgets/self_product_modal.dart
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/entities/my_product_entity.dart';
@@ -70,7 +71,7 @@ class _ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: NetworkImage(product.images.first),
+        backgroundImage: CachedNetworkImageProvider(product.images.first),
         radius: 24,
       ),
       title: Text(product.title),

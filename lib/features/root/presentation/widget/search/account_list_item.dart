@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:offgrid_nation_app/core/constants/theme_constants.dart';
@@ -87,7 +88,7 @@ class _ProfileListItemState extends State<ProfileListItem> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundImage: NetworkImage(widget.avatarUrl),
+            backgroundImage: CachedNetworkImageProvider(widget.avatarUrl),
           ),
           const SizedBox(width: 16),
           Expanded(

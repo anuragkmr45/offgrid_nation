@@ -7,6 +7,7 @@ class AndroidWrapper extends StatefulWidget {
   final int currentTabIndex;
   final ValueChanged<int>? onTabSelected;
   final bool isHomeScreen;
+  final bool isPremium;
 
   const AndroidWrapper({
     super.key,
@@ -14,6 +15,7 @@ class AndroidWrapper extends StatefulWidget {
     this.currentTabIndex = 0,
     this.onTabSelected,
     this.isHomeScreen = false,
+    this.isPremium = false,
   });
 
   @override
@@ -98,7 +100,8 @@ class _AndroidWrapperState extends State<AndroidWrapper> {
 
   PreferredSizeWidget _buildHomeAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor:
+          widget.isPremium ? const Color(0xFFFbbc06) : AppColors.background,
       iconTheme: const IconThemeData(color: AppColors.textPrimary),
       elevation: 1,
       title: Image.asset('lib/assets/images/logo_black.png', height: 60),
@@ -120,88 +123,4 @@ class _AndroidWrapperState extends State<AndroidWrapper> {
       ],
     );
   }
-
-  // PreferredSizeWidget _buildOtherAppBar(BuildContext context) {
-  //   return PreferredSize(
-  //     preferredSize: const Size.fromHeight(kToolbarHeight),
-  //     child: Container(
-  //       color: AppColors.primary,
-  //       child: SafeArea(
-  //         child: Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             Padding(
-  //               padding: const EdgeInsets.only(left: 8.0),
-  //               child: InkWell(
-  //                 // onTap: () => Navigator.pop(context),
-  //                 onTap: () => {},
-  //                 child: Container(
-  //                   width: 36,
-  //                   height: 36,
-  //                   decoration: const BoxDecoration(
-  //                     color: Colors.white,
-  //                     shape: BoxShape.circle,
-  //                   ),
-  //                   child: const Icon(
-  //                     Icons.arrow_back,
-  //                     color: AppColors.primary,
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //             // OFFGRID Nation logo or text on the right
-  //             Padding(
-  //               padding: const EdgeInsets.only(right: 16.0),
-  //               child: Image.asset('lib/assets/images/image.png', height: 400),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _buildDrawer(BuildContext context) {
-  //   return Drawer(
-  //     child: SafeArea(
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.stretch,
-  //         children: [
-  //           DrawerHeader(
-  //             decoration: const BoxDecoration(color: Colors.blue),
-  //             child: Image.asset('lib/assets/images/image.png', height: 20),
-  //             // Row(
-  //             //   children: [
-  //             //     const SizedBox(width: 8),
-  //             //     const Text(
-  //             //       'Menu',
-  //             //       style: TextStyle(color: Colors.white, fontSize: 20),
-  //             //     ),
-  //             //   ],
-  //             // ),
-  //           ),
-  //           ListTile(
-  //             leading: const Icon(Icons.home),
-  //             title: const Text('Home'),
-  //             onTap: () {
-  //               Navigator.pop(context);
-  //               // TODO: Navigate to Home.
-  //             },
-  //           ),
-  //           ListTile(
-  //             leading: const Icon(Icons.settings),
-  //             title: const Text('Settings'),
-  //             onTap: () {
-  //               Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(builder: (context) => const SettingsPage()),
-  //               );
-  //             },
-  //           ),
-  //           // Add more drawer items here.
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

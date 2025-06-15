@@ -8,6 +8,7 @@ class MainWrapper extends StatelessWidget {
   final int currentTabIndex;
   final ValueChanged<int>? onTabSelected;
   final bool isHomeScreen;
+  final bool isPremium; 
 
   const MainWrapper({
     super.key,
@@ -15,6 +16,7 @@ class MainWrapper extends StatelessWidget {
     this.currentTabIndex = 0,
     this.onTabSelected,
     this.isHomeScreen = false,
+    this.isPremium = false, 
   });
 
   @override
@@ -24,12 +26,14 @@ class MainWrapper extends StatelessWidget {
           currentTabIndex: currentTabIndex,
           onTabSelected: onTabSelected,
           // isHomeScreen: isHomeScreen,
+          isPremium: isPremium, 
           child: child,
         )
         : AndroidWrapper(
           currentTabIndex: currentTabIndex,
           onTabSelected: onTabSelected,
           isHomeScreen: isHomeScreen,
+          isPremium: isPremium, 
           child: child,
         );
   }

@@ -2,17 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:offgrid_nation_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:offgrid_nation_app/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:offgrid_nation_app/core/session/auth_session.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final FirebaseAuth _firebaseAuth;
+  final FirebaseAuth firebaseAuth;
   final AuthRemoteDataSource remoteDataSource;
   final FlutterSecureStorage secureStorage;
 
   AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.secureStorage,
-  }) : _firebaseAuth = FirebaseAuth.instance;
+  }) : firebaseAuth = FirebaseAuth.instance;
 
   // @override
   // Future<String> signIn(String identifier, String password) async {

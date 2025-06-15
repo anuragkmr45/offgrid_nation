@@ -169,42 +169,41 @@ class MarketplaceRemoteDataSourceImpl implements MarketplaceRemoteDataSource {
     }
   }
 
-  @override
-  Future<List<dynamic>> listProducts({
-    required double latitude,
-    required double longitude,
-    int limit = 20,
-    String? cursor,
-    String? sortBy,
-    String? category,
-  }) async {
-    try {
-      final token = await authSession.getSessionToken();
-      if (token == null) throw const NetworkException('Unauthorized');
-      
-      final queryParams = {
-        'latitude': latitude.toString(),
-        'longitude': longitude.toString(),
-        'limit': limit.toString(),
-        if (cursor != null) 'cursor': cursor,
-        if (sortBy != null) 'sortBy': sortBy,
-        if (category != null) 'category': category,
-      };
+@override
+Future<List<dynamic>> listProducts({
+  required double latitude,
+  required double longitude,
+  int limit = 20,
+  String? cursor,
+  String? sortBy,
+  String? category,
+}) async {
+  try {
+    final token = await authSession.getSessionToken();
+    if (token == null) throw const NetworkException('Unauthorized');
+    print("==================================================================================================================");
+    final queryParams = {
+      'latitude': latitude.toString(),
+      'longitude': longitude.toString(),
+      'limit': limit.toString(),
+      if (cursor != null) 'cursor': cursor,
+      if (sortBy != null) 'sortBy': sortBy,
+      if (category != null) 'category': category,
+    };
 
-      final response = await apiClient.get(
-        ApiConstants.listProductsEndpoint,
-        headers: {'Authorization': 'Bearer $token'},
-        queryParams: queryParams,
-      );
-      
-      if (response == null || response is! List) {
-        throw const NetworkException('Invalid list products response');
-      }
-      return response;
-    } catch (e) {
-      throw NetworkException('List products failed: ${e.toString()}');
+    final response = await apiClient.get(
+      ApiConstants.listProductsEndpoint,
+      headers: {'Authorization': 'Bearer $token'},
+      queryParams: queryParams,
+    );
+    if (response == null || response is! List) {
+      throw const NetworkException('Invalid list products response');
     }
+    return response;
+  } catch (e) {
+    throw NetworkException('List products failed: ${e.toString()}');
   }
+}
 
   @override
   Future<Map<String, dynamic>> addRating({

@@ -1,4 +1,3 @@
-// lib/features/marketplace/domain/entities/owner_entity.dart
 class OwnerEntity {
   final String userId;
   final String username;
@@ -12,7 +11,7 @@ class OwnerEntity {
 
   factory OwnerEntity.fromJson(Map<String, dynamic> json) {
     return OwnerEntity(
-      userId: json['userId'],
+    userId: json['userId'] ?? json['_id'] ?? '',
       username: json['username'],
       profilePicture: json['profilePicture'],
     );

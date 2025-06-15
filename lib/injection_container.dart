@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:offgrid_nation_app/core/network/api_client.dart';
 import 'package:offgrid_nation_app/core/constants/api_constants.dart';
 import 'package:offgrid_nation_app/core/session/auth_session.dart';
-import 'package:offgrid_nation_app/core/session/social_auth_session.dart';
+// import 'package:offgrid_nation_app/core/session/social_auth_session.dart';
 
 // auth
 import 'package:offgrid_nation_app/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -21,6 +21,19 @@ import 'package:offgrid_nation_app/features/auth/domain/usecases/send_otp_usecas
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/login_bloc.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/reset_password_bloc.dart';
 import 'package:offgrid_nation_app/features/auth/presentation/bloc/signup_bloc.dart';
+import 'package:offgrid_nation_app/features/chat/data/datasource/chat_remote_datasource.dart';
+import 'package:offgrid_nation_app/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:offgrid_nation_app/features/chat/domain/repositories/chat_repository.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/delete_conversation_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_conversations_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_by_recipient_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/get_messages_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/mark_conversation_read_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/mute_conversation_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/search_users_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/domain/usecases/upload_media_usecase.dart';
+import 'package:offgrid_nation_app/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:offgrid_nation_app/features/marketplace/data/datasources/marketplace_remote_datasource.dart';
 import 'package:offgrid_nation_app/features/marketplace/data/repositories/marketplace_repository_impl.dart';
 import 'package:offgrid_nation_app/features/marketplace/domain/repositories/marketplace_repository.dart';
@@ -37,27 +50,33 @@ import 'package:offgrid_nation_app/features/marketplace/presentation/bloc/market
 import 'package:offgrid_nation_app/features/root/data/datasources/add_post_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/content_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/datasources/notification_remote_datasource.dart';
+import 'package:offgrid_nation_app/features/root/data/datasources/premium_remote_data_source.dart';
 
 // profile
 import 'package:offgrid_nation_app/features/root/data/datasources/user_profile_remote_data_source.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/add_post_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/content_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/notification_repository_impl.dart';
+import 'package:offgrid_nation_app/features/root/data/repositories/premium_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/data/repositories/user_profile_repository_impl.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/add_post_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/content_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/notification_repository.dart';
+import 'package:offgrid_nation_app/features/root/domain/repositories/premium_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/repositories/user_profile_repository.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_comment_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/add_reply_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/content_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_comments_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/fetch_replies_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/content/send_post_message_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_comment_like_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/content/toggle_like_dislike_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/fetch_notifications_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/notification/mark_notifications_read_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/posts/add_post_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/premium/create_checkout_session_usecase.dart';
+import 'package:offgrid_nation_app/features/root/domain/usecases/premium/fetch_premium_feed_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_blocked_users_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_follower_requests_usecase.dart';
 import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/fetch_followers_usecase.dart';
@@ -73,6 +92,7 @@ import 'package:offgrid_nation_app/features/root/domain/usecases/user_profile/up
 import 'package:offgrid_nation_app/features/root/presentation/bloc/add_post_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/content_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/notification_bloc.dart';
+import 'package:offgrid_nation_app/features/root/presentation/bloc/premium_bloc.dart';
 import 'package:offgrid_nation_app/features/root/presentation/bloc/user_profile_bloc.dart';
 
 // search
@@ -108,7 +128,7 @@ Future<void> init() async {
     () => AuthSession(apiClient: sl<ApiClient>()),
   );
 
-  sl.registerLazySingleton<SocialAuthSession>(() => SocialAuthSession());
+  // sl.registerLazySingleton<SocialAuthSession>(() => SocialAuthSession());
 
   // ─────────────────────────────────────────────────────────────────────────────
   // ✅ Auth Feature
@@ -333,12 +353,12 @@ Future<void> init() async {
   // ─────────────────────────────────────────────────────────────────
   // notifications
   // ─────────────────────────────────────────────────────────────────
-sl.registerLazySingleton<NotificationRemoteDataSource>(
-  () => NotificationRemoteDataSourceImpl(
-    apiClient: sl<ApiClient>(),
-    authSession: sl<AuthSession>(),
-  ),
-);
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(
+      apiClient: sl<ApiClient>(),
+      authSession: sl<AuthSession>(),
+    ),
+  );
 
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
@@ -347,6 +367,70 @@ sl.registerLazySingleton<NotificationRemoteDataSource>(
   sl.registerLazySingleton(() => FetchNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkNotificationsReadUseCase(sl()));
   sl.registerFactory(
-    () =>  NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
+    () =>
+        NotificationBloc(fetchNotifications: sl(), markNotificationsRead: sl()),
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 💬 Chat Module
+  // ─────────────────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
+  );
+
+  sl.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => SendMessageUsecase(sl()));
+  sl.registerLazySingleton(() => GetMessagesUsecase(sl()));
+  sl.registerLazySingleton(() => UploadMediaUsecase(sl()));
+  sl.registerLazySingleton(() => GetConversationsUsecase(sl()));
+  sl.registerLazySingleton(() => MarkConversationReadUsecase(sl()));
+  sl.registerLazySingleton(() => MuteConversationUsecase(sl()));
+  sl.registerLazySingleton(() => DeleteConversationUsecase(sl()));
+  sl.registerLazySingleton(() => SearchUsersUsecase(sl()));
+  sl.registerLazySingleton<GetMessagesByRecipientUsecase>(
+    () => GetMessagesByRecipientUsecase(sl()),
+  );
+  sl.registerLazySingleton(() => SendPostMessageUsecase(sl()));
+
+  sl.registerFactory(
+    () => ChatBloc(
+      sendMessageUsecase: sl(),
+      getMessagesUsecase: sl(),
+      uploadMediaUsecase: sl(),
+      getConversationsUsecase: sl(),
+      markReadUsecase: sl(),
+      muteUsecase: sl(),
+      deleteUsecase: sl(),
+      searchUsersUsecase: sl(),
+      getMessagesByRecipientUsecase: sl(),
+      sendPostMessageUsecase: sl(),
+    ),
+  );
+
+  // Premium Feature
+  sl.registerLazySingleton<PremiumRemoteDataSource>(
+    () => PremiumRemoteDataSourceImpl(apiClient: sl(), authSession: sl()),
+  );
+
+  sl.registerLazySingleton<PremiumRepository>(
+    () => PremiumRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => FetchPremiumFeedUseCase(sl()));
+
+  sl.registerLazySingleton(() => CreateCheckoutSessionUseCase(sl()));
+
+  sl.registerFactory(
+    () => PremiumBloc(
+      createCheckoutSessionUseCase: sl(),
+      fetchPremiumFeedUseCase: sl(),
+      toggleLikeDislikeUsecase: sl(),
+      addReplyUseCase: sl(),
+      addCommentUseCase: sl(),
+      fetchCommentsUseCase: sl(),
+    ),
   );
 }

@@ -61,11 +61,14 @@ class LocationUtils {
     );
   }
 
-  /// Safely get current position
   static Future<Position?> getCurrentPosition() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return null;
+      if (!serviceEnabled) {
+        // This shows a native Android dialog asking to turn on GPS
+        serviceEnabled = await Geolocator.openLocationSettings();
+        if (!serviceEnabled) return null;
+      }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -78,8 +81,34 @@ class LocationUtils {
       }
 
       return await Geolocator.getCurrentPosition();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Location error: $e');
       return null;
+    }
+  }
+
+  static Future<void> promptToEnableGPS(BuildContext context) async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled && Platform.isAndroid) {
+      await showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Enable Location"),
+              content: const Text(
+                "Please enable location services to continue.",
+              ),
+              actions: [
+                TextButton(
+                  child: const Text("Settings"),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await Geolocator.openLocationSettings();
+                  },
+                ),
+              ],
+            ),
+      );
     }
   }
 
@@ -89,6 +118,34 @@ class LocationUtils {
     return position != null
         ? "${position.latitude},${position.longitude}"
         : null;
+  }
+
+  static Future<void> ensureLocationServiceEnabled(BuildContext context) async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // On Android: can open system location settings
+      if (Platform.isAndroid) {
+        await Geolocator.openLocationSettings();
+      } else if (Platform.isIOS) {
+        // On iOS, can only show guidance, cannot open GPS settings directly
+        await showDialog(
+          context: context,
+          builder:
+              (context) => CupertinoAlertDialog(
+                title: const Text('Enable Location Services'),
+                content: const Text(
+                  'Please enable Location Services from Settings > Privacy > Location Services.',
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+        );
+      }
+    }
   }
 
   static Future<String?> getReadableLocation(

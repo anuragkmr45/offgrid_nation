@@ -70,4 +70,8 @@ class ApiConstants {
   static const String getNotificationsEndpoint = "/notifications";
   static const String markNotificationsReadEndpoint =
       "/notifications/mark-read";
+
+  // premium
+  static const String createCheckoutSessionEndpoint = "/user/payments/create-session";
+  static const String fetchPremiumFeedEndpoint = "/feed/premium";
 }

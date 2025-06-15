@@ -95,7 +95,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 (state.profileData?['fullName'] ?? '').toString().trim();
             final username =
                 (state.profileData?['username'] ?? '').toString().trim();
-            final title = name.isNotEmpty ? name : '@$username';
+            final title = name.isNotEmpty ? name : username;
 
             return Text(
               title,
@@ -109,11 +109,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       child: SafeArea(
         child: BlocBuilder<UserProfileBloc, UserProfileState>(
           builder: (context, state) {
-            if (state.status == UserProfileStatus.loading) {
+            if (state.profileStatus == UserProfileStatus.loading) {
               return const CustomLoader();
             }
 
-            if (state.status == UserProfileStatus.failure) {
+            if (state.profileStatus == UserProfileStatus.failure) {
               return Center(
                 child: Text(state.errorMessage ?? 'Error loading profile'),
               );
@@ -162,7 +162,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                 (state.profileData?['fullName'] ?? '').toString().trim();
             final username =
                 (state.profileData?['username'] ?? '').toString().trim();
-            final title = name.isNotEmpty ? name : '@$username';
+            final title = name.isNotEmpty ? name : username;
             return Text(
               title,
               style: const TextStyle(color: AppColors.background),
@@ -177,11 +177,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
       body: SafeArea(
         child: BlocBuilder<UserProfileBloc, UserProfileState>(
           builder: (context, state) {
-            if (state.status == UserProfileStatus.loading) {
+            if (state.profileStatus == UserProfileStatus.loading) {
               return const CustomLoader();
             }
 
-            if (state.status == UserProfileStatus.failure) {
+            if (state.profileStatus == UserProfileStatus.failure) {
               return Center(child: Text(state.errorMessage ?? 'Error'));
             }
 

@@ -95,7 +95,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response is! Map<String, dynamic>) {
         throw const NetworkException('Invalid response format');
       }
-
+print('--------------------------------------------------------------$response');
       return response;
     } catch (e) {
       throw NetworkException('Failed Google login: $e');
