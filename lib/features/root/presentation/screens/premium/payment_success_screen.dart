@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:offgrid_nation_app/core/widgets/wrapper/root_screen.dart';
+import 'package:offgrid_nation_app/features/root/presentation/screens/premium/premium_screen.dart';
 
 class CheckoutSuccessScreen extends StatelessWidget {
   const CheckoutSuccessScreen({super.key});
@@ -32,7 +31,7 @@ class CheckoutSuccessScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => const RootScreen()),
+                MaterialPageRoute(builder: (_) => const PremiumScreen()),
                 (route) => false,
               ),
               child: const Text('Continue'),
